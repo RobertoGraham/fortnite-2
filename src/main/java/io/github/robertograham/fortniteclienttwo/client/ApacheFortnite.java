@@ -21,10 +21,6 @@ public final class ApacheFortnite implements Fortnite {
         httpClient = builder.httpClient;
     }
 
-    private static ApacheFortnite newInstance(Builder builder) {
-        return new ApacheFortnite(builder);
-    }
-
     @Override
     public String toString() {
         return "ApacheFortnite{" +
@@ -71,7 +67,7 @@ public final class ApacheFortnite implements Fortnite {
 
         @Override
         public Fortnite build() {
-            return newInstance(this);
+            return new ApacheFortnite(this);
         }
 
         @Override
