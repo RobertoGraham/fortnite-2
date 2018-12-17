@@ -16,12 +16,12 @@ public interface Fortnite {
             this.epicGamesPassword = Objects.requireNonNull(epicGamesPassword, "epicGamesPassword cannot be null");
         }
 
-        public final T addEpicGamesLauncherToken(String epicGamesLauncherToken) {
+        public final T setEpicGamesLauncherToken(String epicGamesLauncherToken) {
             this.epicGamesLauncherToken = Objects.requireNonNull(epicGamesLauncherToken, "epicGamesLauncherToken cannot be null");
             return self();
         }
 
-        public final T addFortniteClientToken(String fortniteClientToken) {
+        public final T setFortniteClientToken(String fortniteClientToken) {
             this.fortniteClientToken = Objects.requireNonNull(fortniteClientToken, "fortniteClientToken cannot be null");
             return self();
         }

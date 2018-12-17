@@ -4,6 +4,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public final class ApacheFortnite implements Fortnite {
 
@@ -18,7 +19,7 @@ public final class ApacheFortnite implements Fortnite {
         epicGamesPassword = builder.epicGamesPassword();
         epicGamesLauncherToken = builder.epicGamesLauncherToken();
         fortniteClientToken = builder.fortniteClientToken();
-        httpClient = builder.httpClient;
+        httpClient = Objects.requireNonNull(builder.httpClientSupplier.get(), "httpClient cannot be null");
     }
 
     @Override
@@ -53,15 +54,16 @@ public final class ApacheFortnite implements Fortnite {
 
     public static final class Builder extends Fortnite.Builder<Builder> {
 
-        private HttpClient httpClient = HttpClientBuilder.create()
-                .build();
+        private Supplier<HttpClient> httpClientSupplier = () ->
+                HttpClientBuilder.create()
+                        .build();
 
         public Builder(String epicGamesEmailAddress, String epicGamesPassword) {
             super(epicGamesEmailAddress, epicGamesPassword);
         }
 
-        public Builder addHttpClient(HttpClient httpClient) {
-            this.httpClient = Objects.requireNonNull(httpClient, "httpClient cannot be null");
+        public Builder setHttpClientSupplier(Supplier<HttpClient> httpClientSupplier) {
+            this.httpClientSupplier = Objects.requireNonNull(httpClientSupplier, "httpClientSupplier cannot be null");
             return this;
         }
 
@@ -78,7 +80,7 @@ public final class ApacheFortnite implements Fortnite {
         @Override
         public String toString() {
             return "Builder{" +
-                    "httpClient=" + httpClient +
+                    "httpClientSupplier=" + httpClientSupplier +
                     "} " + super.toString();
         }
 
@@ -91,12 +93,12 @@ public final class ApacheFortnite implements Fortnite {
             if (!super.equals(object))
                 return false;
             Builder builder = (Builder) object;
-            return httpClient.equals(builder.httpClient);
+            return httpClientSupplier.equals(builder.httpClientSupplier);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), httpClient);
+            return Objects.hash(super.hashCode(), httpClientSupplier);
         }
     }
 }
