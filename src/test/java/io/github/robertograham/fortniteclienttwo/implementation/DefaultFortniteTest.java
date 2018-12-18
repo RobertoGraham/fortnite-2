@@ -1,4 +1,4 @@
-package io.github.robertograham.fortniteclienttwo.client;
+package io.github.robertograham.fortniteclienttwo.implementation;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

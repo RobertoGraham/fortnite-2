@@ -6,7 +6,7 @@ fortnite-client-two provides defaults for epicGamesLauncherToken and fortniteCli
 instantiate a DefaultFortnite in this way:
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.DefaultFortnite;
+import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite;
 import io.github.robertograham.fortniteclienttwo.client.Fortnite;
 
 public class Main {
@@ -22,7 +22,7 @@ Otherwise, you can provide your own epicGamesEmailAddress and/or fortniteClientT
 this way:
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.DefaultFortnite;
+import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite;
 import io.github.robertograham.fortniteclienttwo.client.Fortnite;
 
 public class Main {
