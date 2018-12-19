@@ -4,9 +4,10 @@ import io.github.robertograham.fortniteclienttwo.client.Fortnite;
 import io.github.robertograham.fortniteclienttwo.resource.Account;
 import io.github.robertograham.fortniteclienttwo.resource.LeaderBoard;
 import io.github.robertograham.fortniteclienttwo.resource.Statistics;
-import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public final class DefaultFortnite implements Fortnite {
@@ -15,7 +16,7 @@ public final class DefaultFortnite implements Fortnite {
     private final String epicGamesPassword;
     private final String epicGamesLauncherToken;
     private final String fortniteClientToken;
-    private final HttpClient httpClient;
+    private final CloseableHttpClient httpClient;
     private final Account account;
     private final Authentication authentication;
     private final LeaderBoard leaderBoard;
@@ -49,12 +50,17 @@ public final class DefaultFortnite implements Fortnite {
         return statistics;
     }
 
+    @Override
+    public void close() throws IOException {
+        httpClient.close();
+    }
+
     public static final class Builder {
 
         private final String epicGamesEmailAddress;
         private final String epicGamesPassword;
-        private String epicGamesLauncherToken = "default";
-        private String fortniteClientToken = "default";
+        private String epicGamesLauncherToken = "MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=";
+        private String fortniteClientToken = "ZWM2ODRiOGM2ODdmNDc5ZmFkZWEzY2IyYWQ4M2Y1YzY6ZTFmMzFjMjExZjI4NDEzMTg2MjYyZDM3YTEzZmM4NGQ=";
 
         private Builder(String epicGamesEmailAddress, String epicGamesPassword) {
             this.epicGamesEmailAddress = epicGamesEmailAddress;
