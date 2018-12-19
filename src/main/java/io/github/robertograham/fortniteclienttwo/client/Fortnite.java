@@ -1,16 +1,16 @@
 package io.github.robertograham.fortniteclienttwo.client;
 
-import io.github.robertograham.fortniteclienttwo.resource.Account;
-import io.github.robertograham.fortniteclienttwo.resource.LeaderBoard;
-import io.github.robertograham.fortniteclienttwo.resource.Statistics;
+import io.github.robertograham.fortniteclienttwo.resource.AccountResource;
+import io.github.robertograham.fortniteclienttwo.resource.LeaderBoardResource;
+import io.github.robertograham.fortniteclienttwo.resource.StatisticsResource;
 
 import java.io.Closeable;
 
 public interface Fortnite extends Closeable {
 
-    Account account();
+    AccountResource account();
 
-    LeaderBoard leaderBoard();
+    LeaderBoardResource leaderBoard();
 
-    Statistics statistics();
+    StatisticsResource statistics();
 }

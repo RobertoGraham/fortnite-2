@@ -1,9 +1,9 @@
 package io.github.robertograham.fortniteclienttwo.implementation;
 
 import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.resource.Account;
-import io.github.robertograham.fortniteclienttwo.resource.LeaderBoard;
-import io.github.robertograham.fortniteclienttwo.resource.Statistics;
+import io.github.robertograham.fortniteclienttwo.resource.AccountResource;
+import io.github.robertograham.fortniteclienttwo.resource.LeaderBoardResource;
+import io.github.robertograham.fortniteclienttwo.resource.StatisticsResource;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -17,10 +17,10 @@ public final class DefaultFortnite implements Fortnite {
     private final String epicGamesLauncherToken;
     private final String fortniteClientToken;
     private final CloseableHttpClient httpClient;
-    private final Account account;
-    private final Authentication authentication;
-    private final LeaderBoard leaderBoard;
-    private final Statistics statistics;
+    private final AccountResource accountResource;
+    private final AuthenticationResource authenticationResource;
+    private final LeaderBoardResource leaderBoardResource;
+    private final StatisticsResource statisticsResource;
     private Token sessionToken;
 
     private DefaultFortnite(Builder builder) throws IOException {
@@ -30,25 +30,25 @@ public final class DefaultFortnite implements Fortnite {
         fortniteClientToken = builder.fortniteClientToken;
         httpClient = HttpClientBuilder.create()
                 .build();
-        authentication = Authentication.newInstance(httpClient);
+        authenticationResource = AuthenticationResource.newInstance(httpClient);
         sessionToken = fetchSessionToken();
-        account = DefaultAccount.newInstance(httpClient, this::nonExpiredAccessToken);
-        leaderBoard = DefaultLeaderBoard.newInstance(httpClient, this::nonExpiredAccessToken);
-        statistics = DefaultStatistics.newInstance(httpClient, this::nonExpiredAccessToken);
+        accountResource = DefaultAccountResource.newInstance(httpClient, this::nonExpiredAccessToken);
+        leaderBoardResource = DefaultLeaderBoardResource.newInstance(httpClient, this::nonExpiredAccessToken);
+        statisticsResource = DefaultStatisticsResource.newInstance(httpClient, this::nonExpiredAccessToken);
     }
 
     private Token fetchSessionToken() throws IOException {
-        final String accessToken = authentication.passwordGrantedToken(
+        final String accessToken = authenticationResource.passwordGrantedToken(
                 epicGamesEmailAddress,
                 epicGamesPassword,
                 epicGamesLauncherToken
         )
                 .map(Token::accessToken)
                 .orElseThrow(() -> new IllegalStateException("Couldn't retrieve an access token"));
-        final String exchangeCode = authentication.accessTokenGrantedExchange(accessToken)
+        final String exchangeCode = authenticationResource.accessTokenGrantedExchange(accessToken)
                 .map(Exchange::code)
                 .orElseThrow(() -> new IllegalStateException("Couldn't retrieve an exchange code"));
-        return authentication.exchangeCodeGrantedToken(
+        return authenticationResource.exchangeCodeGrantedToken(
                 exchangeCode,
                 fortniteClientToken
         )
@@ -62,22 +62,31 @@ public final class DefaultFortnite implements Fortnite {
     }
 
     private void refreshSessionToken() {
-
+        try {
+            authenticationResource.refreshTokenGrantedToken(
+                    sessionToken.refreshToken(),
+                    fortniteClientToken
+            )
+                    .ifPresent(refreshTokenGrantedToken ->
+                            this.sessionToken = refreshTokenGrantedToken
+                    );
+        } catch (IOException ignored) {
+        }
     }
 
     @Override
-    public Account account() {
-        return account;
+    public AccountResource account() {
+        return accountResource;
     }
 
     @Override
-    public LeaderBoard leaderBoard() {
-        return leaderBoard;
+    public LeaderBoardResource leaderBoard() {
+        return leaderBoardResource;
     }
 
     @Override
-    public Statistics statistics() {
-        return statistics;
+    public StatisticsResource statistics() {
+        return statisticsResource;
     }
 
     @Override

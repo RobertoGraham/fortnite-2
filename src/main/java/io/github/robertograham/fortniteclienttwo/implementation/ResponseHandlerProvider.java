@@ -36,7 +36,8 @@ enum ResponseHandlerProvider {
                 new JsonbConfig()
                         .withAdapters(
                                 Token.Adapter.INSTANCE,
-                                Exchange.Adapter.INSTANCE
+                                Exchange.Adapter.INSTANCE,
+                                DefaultAccount.Adapter.INSTANCE
                         )
         );
     }
