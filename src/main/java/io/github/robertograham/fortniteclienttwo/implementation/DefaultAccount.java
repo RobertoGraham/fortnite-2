@@ -9,17 +9,15 @@ final class DefaultAccount implements Account {
 
     private final HttpClient httpClient;
     private final Supplier<String> accessTokenSupplier;
-    private final Runnable refreshSessionTokenRunnable;
 
-    private DefaultAccount(HttpClient httpClient, Supplier<String> accessTokenSupplier, Runnable refreshSessionTokenRunnable) {
+    private DefaultAccount(HttpClient httpClient,
+                           Supplier<String> accessTokenSupplier) {
         this.httpClient = httpClient;
         this.accessTokenSupplier = accessTokenSupplier;
-        this.refreshSessionTokenRunnable = refreshSessionTokenRunnable;
     }
 
     static DefaultAccount newInstance(HttpClient httpClient,
-                                      Supplier<String> accessTokenSupplier,
-                                      Runnable refreshSessionTokenRunnable) {
-        return new DefaultAccount(httpClient, accessTokenSupplier, refreshSessionTokenRunnable);
+                                      Supplier<String> sessionTokenSupplier) {
+        return new DefaultAccount(httpClient, sessionTokenSupplier);
     }
 }

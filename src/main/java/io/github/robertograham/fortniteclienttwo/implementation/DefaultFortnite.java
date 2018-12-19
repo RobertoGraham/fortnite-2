@@ -32,9 +32,9 @@ public final class DefaultFortnite implements Fortnite {
                 .build();
         authentication = Authentication.newInstance(httpClient);
         sessionToken = fetchSessionToken();
-        account = DefaultAccount.newInstance(httpClient, sessionToken::accessToken, this::refreshSessionToken);
-        leaderBoard = DefaultLeaderBoard.newInstance(httpClient, sessionToken::accessToken, this::refreshSessionToken);
-        statistics = DefaultStatistics.newInstance(httpClient, sessionToken::accessToken, this::refreshSessionToken);
+        account = DefaultAccount.newInstance(httpClient, this::nonExpiredAccessToken);
+        leaderBoard = DefaultLeaderBoard.newInstance(httpClient, this::nonExpiredAccessToken);
+        statistics = DefaultStatistics.newInstance(httpClient, this::nonExpiredAccessToken);
     }
 
     private Token fetchSessionToken() throws IOException {
@@ -55,7 +55,14 @@ public final class DefaultFortnite implements Fortnite {
                 .orElseThrow(() -> new IllegalStateException("Couldn't establish a session"));
     }
 
+    private String nonExpiredAccessToken() {
+        if (sessionToken.isExpired())
+            refreshSessionToken();
+        return sessionToken.accessToken();
+    }
+
     private void refreshSessionToken() {
+
     }
 
     @Override

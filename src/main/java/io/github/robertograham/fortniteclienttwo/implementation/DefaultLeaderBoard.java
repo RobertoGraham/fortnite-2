@@ -9,17 +9,15 @@ final class DefaultLeaderBoard implements LeaderBoard {
 
     private final HttpClient httpClient;
     private final Supplier<String> accessTokenSupplier;
-    private final Runnable refreshSessionTokenRunnable;
 
-    private DefaultLeaderBoard(HttpClient httpClient, Supplier<String> accessTokenSupplier, Runnable refreshSessionTokenRunnable) {
+    private DefaultLeaderBoard(HttpClient httpClient,
+                               Supplier<String> accessTokenSupplier) {
         this.httpClient = httpClient;
         this.accessTokenSupplier = accessTokenSupplier;
-        this.refreshSessionTokenRunnable = refreshSessionTokenRunnable;
     }
 
     static DefaultLeaderBoard newInstance(HttpClient httpClient,
-                                          Supplier<String> accessTokenSupplier,
-                                          Runnable refreshSessionTokenRunnable) {
-        return new DefaultLeaderBoard(httpClient, accessTokenSupplier, refreshSessionTokenRunnable);
+                                          Supplier<String> sessionTokenSupplier) {
+        return new DefaultLeaderBoard(httpClient, sessionTokenSupplier);
     }
 }

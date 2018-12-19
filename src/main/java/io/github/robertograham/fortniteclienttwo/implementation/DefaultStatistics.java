@@ -9,17 +9,15 @@ final class DefaultStatistics implements Statistics {
 
     private final HttpClient httpClient;
     private final Supplier<String> accessTokenSupplier;
-    private final Runnable refreshSessionTokenRunnable;
 
-    private DefaultStatistics(HttpClient httpClient, Supplier<String> accessTokenSupplier, Runnable refreshSessionTokenRunnable) {
+    private DefaultStatistics(HttpClient httpClient,
+                           Supplier<String> accessTokenSupplier) {
         this.httpClient = httpClient;
         this.accessTokenSupplier = accessTokenSupplier;
-        this.refreshSessionTokenRunnable = refreshSessionTokenRunnable;
     }
 
     static DefaultStatistics newInstance(HttpClient httpClient,
-                                         Supplier<String> accessTokenSupplier,
-                                         Runnable refreshSessionTokenRunnable) {
-        return new DefaultStatistics(httpClient, accessTokenSupplier, refreshSessionTokenRunnable);
+                                      Supplier<String> sessionTokenSupplier) {
+        return new DefaultStatistics(httpClient, sessionTokenSupplier);
     }
 }
