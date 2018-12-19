@@ -67,12 +67,12 @@ public final class DefaultFortnite implements Fortnite {
             return new Builder(epicGamesEmailAddress, epicGamesPassword);
         }
 
-        public final Builder setEpicGamesLauncherToken(String epicGamesLauncherToken) {
+        public Builder setEpicGamesLauncherToken(String epicGamesLauncherToken) {
             this.epicGamesLauncherToken = Objects.requireNonNull(epicGamesLauncherToken, "epicGamesLauncherToken cannot be null");
             return this;
         }
 
-        public final Builder setFortniteClientToken(String fortniteClientToken) {
+        public Builder setFortniteClientToken(String fortniteClientToken) {
             this.fortniteClientToken = Objects.requireNonNull(fortniteClientToken, "fortniteClientToken cannot be null");
             return this;
         }
