@@ -21,18 +21,41 @@ public final class DefaultFortnite implements Fortnite {
     private final Authentication authentication;
     private final LeaderBoard leaderBoard;
     private final Statistics statistics;
+    private Token sessionToken;
 
-    private DefaultFortnite(Builder builder) {
+    private DefaultFortnite(Builder builder) throws IOException {
         epicGamesEmailAddress = builder.epicGamesEmailAddress;
         epicGamesPassword = builder.epicGamesPassword;
         epicGamesLauncherToken = builder.epicGamesLauncherToken;
         fortniteClientToken = builder.fortniteClientToken;
         httpClient = HttpClientBuilder.create()
                 .build();
-        account = DefaultAccount.newInstance(httpClient);
         authentication = Authentication.newInstance(httpClient);
-        leaderBoard = DefaultLeaderBoard.newInstance(httpClient);
-        statistics = DefaultStatistics.newInstance(httpClient);
+        sessionToken = fetchSessionToken();
+        account = DefaultAccount.newInstance(httpClient, sessionToken::accessToken, this::refreshSessionToken);
+        leaderBoard = DefaultLeaderBoard.newInstance(httpClient, sessionToken::accessToken, this::refreshSessionToken);
+        statistics = DefaultStatistics.newInstance(httpClient, sessionToken::accessToken, this::refreshSessionToken);
+    }
+
+    private Token fetchSessionToken() throws IOException {
+        final String accessToken = authentication.passwordGrantedToken(
+                epicGamesEmailAddress,
+                epicGamesPassword,
+                epicGamesLauncherToken
+        )
+                .map(Token::accessToken)
+                .orElseThrow(() -> new IllegalStateException("Couldn't retrieve an access token"));
+        final String exchangeCode = authentication.accessTokenGrantedExchange(accessToken)
+                .map(Exchange::code)
+                .orElseThrow(() -> new IllegalStateException("Couldn't retrieve an exchange code"));
+        return authentication.exchangeCodeGrantedToken(
+                exchangeCode,
+                fortniteClientToken
+        )
+                .orElseThrow(() -> new IllegalStateException("Couldn't establish a session"));
+    }
+
+    private void refreshSessionToken() {
     }
 
     @Override
@@ -84,7 +107,11 @@ public final class DefaultFortnite implements Fortnite {
         }
 
         public DefaultFortnite build() {
-            return new DefaultFortnite(this);
+            try {
+                return new DefaultFortnite(this);
+            } catch (IOException e) {
+                throw new IllegalStateException("Authorisation error occurred when trying establishing session", e);
+            }
         }
     }
 }
