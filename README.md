@@ -89,7 +89,7 @@ public class Main {
 }
 ```
 
-### Fetching multiple accounts using their accountIds
+### Fetching multiple accounts using their account IDs
 
 ```java
 import io.github.robertograham.fortniteclienttwo.client.Fortnite;
@@ -113,7 +113,7 @@ public class Main {
                     .map(Account::accountId)
                     .orElse("");
             // accounts will be empty if the response was empty 
-            // OR if every accountId was invalid
+            // OR if every account ID was invalid
             Set<Account> accounts = fortnite.account()
                     .accountsFromAccountIds(accountId1, accountId2)
                     .orElse(new HashSet<>());
