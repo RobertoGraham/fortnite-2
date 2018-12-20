@@ -80,7 +80,7 @@ public class Main {
                     .orElse("");
             // displayName will be blank if the response was empty
             String displayName = accountOptional.map(Account::displayName)
-                    .orElse("");
+                    .orElseGet(HashSet::new);
         } catch (IOException exception) {
             // problem fetching the account 
             // OR releasing resources
