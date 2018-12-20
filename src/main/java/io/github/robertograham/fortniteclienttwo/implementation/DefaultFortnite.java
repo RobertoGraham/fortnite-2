@@ -122,7 +122,7 @@ public final class DefaultFortnite implements Fortnite {
             return this;
         }
 
-        public DefaultFortnite build() {
+        public Fortnite build() {
             try {
                 return new DefaultFortnite(this);
             } catch (IOException e) {
