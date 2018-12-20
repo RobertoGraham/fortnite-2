@@ -80,7 +80,7 @@ public class Main {
                     .orElse("");
             // displayName will be blank if the response was empty
             String displayName = accountOptional.map(Account::displayName)
-                    .orElseGet(HashSet::new);
+                    .orElse("");
         } catch (IOException exception) {
             // problem fetching the account 
             // OR releasing resources
@@ -116,7 +116,7 @@ public class Main {
             // OR if every account ID was invalid
             Set<Account> accounts = fortnite.account()
                     .accountsFromAccountIds(accountId1, accountId2)
-                    .orElse(new HashSet<>());
+                    .orElseGet(HashSet::new);
             System.out.println(accounts);
         } catch (IOException exception) {
             // problem fetching the individual accounts
