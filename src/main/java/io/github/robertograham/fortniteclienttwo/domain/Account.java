@@ -2,7 +2,7 @@ package io.github.robertograham.fortniteclienttwo.domain;
 
 public interface Account {
 
-    String id();
+    String accountId();
 
     String displayName();
 }

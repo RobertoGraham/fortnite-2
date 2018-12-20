@@ -58,7 +58,7 @@ public class Main {
 }
 ```
 
-### Fetching an account
+### Fetching a single account using its display name
 
 ```java
 import io.github.robertograham.fortniteclienttwo.client.Fortnite;
@@ -75,14 +75,53 @@ public class Main {
         try (Fortnite fortnite = builder.build()) {
             Optional<Account> accountOptional = fortnite.account()
                     .accountFromDisplayName("RobertoGraham");
-            // accountId will be null if the response was empty OR if the account has a null id
-            String accountId = accountOptional.map(Account::id)
-                    .orElse(null);
-            // displayName will be null if the response was empty OR if the account has a null displayName
+            // accountId will be blank if the response was empty
+            String accountId = accountOptional.map(Account::accountId)
+                    .orElse("");
+            // displayName will be blank if the response was empty
             String displayName = accountOptional.map(Account::displayName)
-                    .orElse(null);
+                    .orElse("");
         } catch (IOException exception) {
-            // problem fetching the account OR releasing resources
+            // problem fetching the account 
+            // OR releasing resources
+        }
+    }
+}
+```
+
+### Fetching multiple accounts using their accountIds
+
+```java
+import io.github.robertograham.fortniteclienttwo.client.Fortnite;
+import io.github.robertograham.fortniteclienttwo.domain.Account;
+import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+import java.util.Set;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (Fortnite fortnite = builder.build()) {
+            String accountId1 = fortnite.account()
+                    .accountFromDisplayName("RobertoGraham")
+                    .map(Account::accountId)
+                    .orElse("");
+            String accountId2 = fortnite.account()
+                    .accountFromDisplayName("Ninja")
+                    .map(Account::accountId)
+                    .orElse("");
+            // accounts will be empty if the response was empty 
+            // OR if every accountId was invalid
+            Set<Account> accounts = fortnite.account()
+                    .accountsFromAccountIds(accountId1, accountId2)
+                    .orElse(new HashSet<>());
+            System.out.println(accounts);
+        } catch (IOException exception) {
+            // problem fetching the individual accounts
+            // OR fetching all the accounts
+            // OR releasing resources
         }
     }
 }

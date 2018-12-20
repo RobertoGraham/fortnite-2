@@ -8,17 +8,17 @@ import java.util.Objects;
 
 final class DefaultAccount implements Account {
 
-    private final String id;
+    private final String accountId;
     private final String displayName;
 
     private DefaultAccount(JsonObject jsonObject) {
-        id = jsonObject.getString("id", null);
+        accountId = jsonObject.getString("id", null);
         displayName = jsonObject.getString("displayName", null);
     }
 
     @Override
-    public String id() {
-        return id;
+    public String accountId() {
+        return accountId;
     }
 
     @Override
@@ -29,7 +29,7 @@ final class DefaultAccount implements Account {
     @Override
     public String toString() {
         return "DefaultAccount{" +
-                "id='" + id + '\'' +
+                "accountId='" + accountId + '\'' +
                 ", displayName='" + displayName + '\'' +
                 '}';
     }
@@ -41,13 +41,13 @@ final class DefaultAccount implements Account {
         if (!(object instanceof DefaultAccount))
             return false;
         DefaultAccount defaultAccount = (DefaultAccount) object;
-        return Objects.equals(id, defaultAccount.id) &&
+        return Objects.equals(accountId, defaultAccount.accountId) &&
                 Objects.equals(displayName, defaultAccount.displayName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, displayName);
+        return Objects.hash(accountId, displayName);
     }
 
     enum Adapter implements JsonbAdapter<DefaultAccount, JsonObject> {

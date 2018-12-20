@@ -8,13 +8,15 @@ import org.apache.http.client.methods.HttpGet;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 final class DefaultAccountResource implements AccountResource {
 
-    private static final URI LOOKUP_URI = URI.create("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup?q=");
+    private static final URI SINGLE_ACCOUNT_URI = URI.create("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup?q=");
+    private static final URI MULTIPLE_ACCOUNTS_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account?");
     private final HttpClient httpClient;
     private final Supplier<String> accessTokenSupplier;
 
@@ -31,12 +33,38 @@ final class DefaultAccountResource implements AccountResource {
 
     @Override
     public Optional<Account> accountFromDisplayName(String displayName) throws IOException {
-        final HttpGet httpGet = new HttpGet(String.format("%s%s", LOOKUP_URI, displayName));
+        Objects.requireNonNull(displayName, "displayName cannot be null");
+        final HttpGet httpGet = new HttpGet(String.format("%s%s", SINGLE_ACCOUNT_URI, displayName));
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessTokenSupplier.get()));
         return httpClient.execute(
                 httpGet,
                 ResponseHandlerProvider.INSTANCE.responseHandlerForClass(DefaultAccount.class)
         )
                 .map(Function.identity());
+    }
+
+    @Override
+    public Optional<Set<Account>> accountsFromAccountIds(String... accountIds) throws IOException {
+        Objects.requireNonNull(accountIds, "accountIds cannot be null");
+        if (
+                Arrays.stream(accountIds)
+                        .anyMatch(Objects::isNull)
+        )
+            throw new NullPointerException("accountIds cannot contain null value");
+        final HttpGet httpGet = new HttpGet(
+                String.format(
+                        "%s%s",
+                        MULTIPLE_ACCOUNTS_URI,
+                        Arrays.stream(accountIds)
+                                .map("accountId="::concat)
+                                .collect(Collectors.joining("&"))
+                )
+        );
+        httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessTokenSupplier.get()));
+        return httpClient.execute(
+                httpGet,
+                ResponseHandlerProvider.INSTANCE.responseHandlerForClass(DefaultAccount[].class)
+        )
+                .map(accounts -> new HashSet<>(Arrays.asList(accounts)));
     }
 }
