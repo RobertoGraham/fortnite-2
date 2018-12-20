@@ -43,7 +43,7 @@ final class Exchange {
         INSTANCE;
 
         @Override
-        public JsonObject adaptToJson(Exchange token) {
+        public JsonObject adaptToJson(Exchange exchange) {
             throw new UnsupportedOperationException();
         }
 

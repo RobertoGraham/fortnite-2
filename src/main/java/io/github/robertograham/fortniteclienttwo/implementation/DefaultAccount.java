@@ -55,7 +55,7 @@ final class DefaultAccount implements Account {
         INSTANCE;
 
         @Override
-        public JsonObject adaptToJson(DefaultAccount token) {
+        public JsonObject adaptToJson(DefaultAccount defaultAccount) {
             throw new UnsupportedOperationException();
         }
 
