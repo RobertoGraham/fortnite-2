@@ -8,8 +8,6 @@ This is the simplest way to instantiate a client:
 import io.github.robertograham.fortniteclienttwo.client.Fortnite;
 import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
 
-import java.io.IOException;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -24,8 +22,6 @@ If Epic Games ever deprecate this library's default launcher and client tokens, 
 ```java
 import io.github.robertograham.fortniteclienttwo.client.Fortnite;
 import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
-
-import java.io.IOException;
 
 public class Main {
 
