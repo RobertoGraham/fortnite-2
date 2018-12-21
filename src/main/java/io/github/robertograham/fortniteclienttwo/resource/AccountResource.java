@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface AccountResource {
 
-    Optional<Account> accountFromDisplayName(String displayName) throws IOException;
+    Optional<Account> findOneByDisplayName(String displayName) throws IOException;
 
-    Optional<Set<Account>> accountsFromAccountIds(String... accountIds) throws IOException;
+    Optional<Set<Account>> findAllByAccountIds(String... accountIds) throws IOException;
 }

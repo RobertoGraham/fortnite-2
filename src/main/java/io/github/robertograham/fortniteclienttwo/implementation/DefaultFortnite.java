@@ -3,7 +3,7 @@ package io.github.robertograham.fortniteclienttwo.implementation;
 import io.github.robertograham.fortniteclienttwo.client.Fortnite;
 import io.github.robertograham.fortniteclienttwo.resource.AccountResource;
 import io.github.robertograham.fortniteclienttwo.resource.LeaderBoardResource;
-import io.github.robertograham.fortniteclienttwo.resource.StatisticsResource;
+import io.github.robertograham.fortniteclienttwo.resource.StatisticResource;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -20,7 +20,7 @@ public final class DefaultFortnite implements Fortnite {
     private final AccountResource accountResource;
     private final AuthenticationResource authenticationResource;
     private final LeaderBoardResource leaderBoardResource;
-    private final StatisticsResource statisticsResource;
+    private final StatisticResource statisticResource;
     private Token sessionToken;
 
     private DefaultFortnite(Builder builder) throws IOException {
@@ -34,7 +34,7 @@ public final class DefaultFortnite implements Fortnite {
         sessionToken = fetchSessionToken();
         accountResource = DefaultAccountResource.newInstance(httpClient, this::nonExpiredAccessToken);
         leaderBoardResource = DefaultLeaderBoardResource.newInstance(httpClient, this::nonExpiredAccessToken);
-        statisticsResource = DefaultStatisticsResource.newInstance(httpClient, this::nonExpiredAccessToken);
+        statisticResource = DefaultStatisticResource.newInstance(httpClient, this::nonExpiredAccessToken);
     }
 
     private Token fetchSessionToken() throws IOException {
@@ -85,13 +85,21 @@ public final class DefaultFortnite implements Fortnite {
     }
 
     @Override
-    public StatisticsResource statistics() {
-        return statisticsResource;
+    public StatisticResource statistic() {
+        return statisticResource;
     }
 
     @Override
-    public void close() throws IOException {
-        httpClient.close();
+    public void close() {
+        // TODO log exceptions
+        try {
+            authenticationResource.retireAccessToken(nonExpiredAccessToken());
+        } catch (IOException ignored) {
+        }
+        try {
+            httpClient.close();
+        } catch (IOException ignored) {
+        }
     }
 
     public static final class Builder {
@@ -126,7 +134,7 @@ public final class DefaultFortnite implements Fortnite {
             try {
                 return new DefaultFortnite(this);
             } catch (IOException e) {
-                throw new IllegalStateException("Authorisation error occurred when trying establishing session", e);
+                throw new IllegalStateException("Authorisation error occurred when establishing session", e);
             }
         }
     }

@@ -32,7 +32,7 @@ final class DefaultAccountResource implements AccountResource {
     }
 
     @Override
-    public Optional<Account> accountFromDisplayName(String displayName) throws IOException {
+    public Optional<Account> findOneByDisplayName(String displayName) throws IOException {
         Objects.requireNonNull(displayName, "displayName cannot be null");
         final HttpGet httpGet = new HttpGet(String.format("%s%s", SINGLE_ACCOUNT_URI, displayName));
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessTokenSupplier.get()));
@@ -44,12 +44,10 @@ final class DefaultAccountResource implements AccountResource {
     }
 
     @Override
-    public Optional<Set<Account>> accountsFromAccountIds(String... accountIds) throws IOException {
+    public Optional<Set<Account>> findAllByAccountIds(String... accountIds) throws IOException {
         Objects.requireNonNull(accountIds, "accountIds cannot be null");
-        if (
-                Arrays.stream(accountIds)
-                        .anyMatch(Objects::isNull)
-        )
+        if (Arrays.stream(accountIds)
+                .anyMatch(Objects::isNull))
             throw new NullPointerException("accountIds cannot contain null value");
         final HttpGet httpGet = new HttpGet(
                 String.format(

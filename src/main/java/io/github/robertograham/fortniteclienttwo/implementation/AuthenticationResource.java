@@ -4,6 +4,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
@@ -17,6 +18,7 @@ final class AuthenticationResource {
 
     private static final URI TOKEN_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/token");
     private static final URI EXCHANGE_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/exchange");
+    private static final URI KILL_TOKEN_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/sessions/kill/");
     private static final NameValuePair GRANT_TYPE_PASSWORD = new BasicNameValuePair("grant_type", "password");
     private static final NameValuePair GRANT_TYPE_EXCHANGE_CODE = new BasicNameValuePair("grant_type", "exchange_code");
     private static final NameValuePair GRANT_TYPE_REFRESH_TOKEN = new BasicNameValuePair("grant_type", "refresh_token");
@@ -32,23 +34,28 @@ final class AuthenticationResource {
         return new AuthenticationResource(httpClient);
     }
 
-    Optional<Token> passwordGrantedToken(String epicGamesEmailAddress, String epicGamesPassword, String epicGamesLauncherToken) throws IOException {
+    private Optional<Token> postForToken(String authorizationHeaderToken,
+                                         NameValuePair... urlEncodedFormParts) throws IOException {
         final HttpPost httpPost = new HttpPost(TOKEN_URI);
-        httpPost.setHeader(HttpHeaders.AUTHORIZATION, String.format("basic %s", epicGamesLauncherToken));
+        httpPost.setHeader(HttpHeaders.AUTHORIZATION, String.format("basic %s", authorizationHeaderToken));
         httpPost.setEntity(
                 new UrlEncodedFormEntity(
-                        () -> Arrays.asList(
-                                GRANT_TYPE_PASSWORD,
-                                INCLUDE_PERMS_TRUE,
-                                new BasicNameValuePair("username", epicGamesEmailAddress),
-                                new BasicNameValuePair("password", epicGamesPassword)
-                        )
-                                .iterator()
+                        Arrays.asList(urlEncodedFormParts)
                 )
         );
         return httpClient.execute(
                 httpPost,
                 ResponseHandlerProvider.INSTANCE.responseHandlerForClass(Token.class)
+        );
+    }
+
+    Optional<Token> passwordGrantedToken(String epicGamesEmailAddress, String epicGamesPassword, String epicGamesLauncherToken) throws IOException {
+        return postForToken(
+                epicGamesLauncherToken,
+                GRANT_TYPE_PASSWORD,
+                INCLUDE_PERMS_TRUE,
+                new BasicNameValuePair("username", epicGamesEmailAddress),
+                new BasicNameValuePair("password", epicGamesPassword)
         );
     }
 
@@ -62,41 +69,36 @@ final class AuthenticationResource {
     }
 
     Optional<Token> exchangeCodeGrantedToken(String exchangeCode, String fortniteClientToken) throws IOException {
-        final HttpPost httpPost = new HttpPost(TOKEN_URI);
-        httpPost.setHeader(HttpHeaders.AUTHORIZATION, String.format("basic %s", fortniteClientToken));
-        httpPost.setEntity(
-                new UrlEncodedFormEntity(
-                        () -> Arrays.asList(
-                                GRANT_TYPE_EXCHANGE_CODE,
-                                TOKEN_TYPE_EG1,
-                                INCLUDE_PERMS_TRUE,
-                                new BasicNameValuePair("exchange_code", exchangeCode)
-                        )
-                                .iterator()
-                )
-        );
-        return httpClient.execute(
-                httpPost,
-                ResponseHandlerProvider.INSTANCE.responseHandlerForClass(Token.class)
+        return postForToken(
+                fortniteClientToken,
+                GRANT_TYPE_EXCHANGE_CODE,
+                TOKEN_TYPE_EG1,
+                INCLUDE_PERMS_TRUE,
+                new BasicNameValuePair("exchange_code", exchangeCode)
         );
     }
 
     Optional<Token> refreshTokenGrantedToken(String refreshToken, String fortniteClientToken) throws IOException {
-        final HttpPost httpPost = new HttpPost(TOKEN_URI);
-        httpPost.setHeader(HttpHeaders.AUTHORIZATION, String.format("basic %s", fortniteClientToken));
-        httpPost.setEntity(
-                new UrlEncodedFormEntity(
-                        () -> Arrays.asList(
-                                GRANT_TYPE_REFRESH_TOKEN,
-                                INCLUDE_PERMS_TRUE,
-                                new BasicNameValuePair("refresh_token", refreshToken)
-                        )
-                                .iterator()
+        return postForToken(
+                fortniteClientToken,
+                GRANT_TYPE_REFRESH_TOKEN,
+                INCLUDE_PERMS_TRUE,
+                new BasicNameValuePair("refresh_token", refreshToken)
+        );
+    }
+
+    void retireAccessToken(String accessToken) throws IOException {
+        final HttpDelete httpDelete = new HttpDelete(
+                String.format(
+                        "%s%s",
+                        KILL_TOKEN_URI,
+                        accessToken
                 )
         );
-        return httpClient.execute(
-                httpPost,
-                ResponseHandlerProvider.INSTANCE.responseHandlerForClass(Token.class)
+        httpDelete.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessToken));
+        httpClient.execute(
+                httpDelete,
+                ResponseHandlerProvider.STRING_OPTIONAL_RESPONSE_HANDLER
         );
     }
 }

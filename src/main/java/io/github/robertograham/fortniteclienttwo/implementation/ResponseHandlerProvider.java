@@ -27,7 +27,7 @@ enum ResponseHandlerProvider {
         if (statusCode >= 200 && statusCode < 300)
             return entityAsStringOptional;
         else
-            throw new ClientProtocolException(String.format("Unexpected response status: %d", statusCode));
+            throw new ClientProtocolException(String.format("Unexpected response [%d]: [%s]", statusCode, entityAsStringOptional.orElse("")));
     };
     private final Jsonb jsonb;
 

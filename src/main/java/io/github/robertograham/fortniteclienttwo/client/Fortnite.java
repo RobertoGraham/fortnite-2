@@ -2,15 +2,16 @@ package io.github.robertograham.fortniteclienttwo.client;
 
 import io.github.robertograham.fortniteclienttwo.resource.AccountResource;
 import io.github.robertograham.fortniteclienttwo.resource.LeaderBoardResource;
-import io.github.robertograham.fortniteclienttwo.resource.StatisticsResource;
+import io.github.robertograham.fortniteclienttwo.resource.StatisticResource;
 
-import java.io.Closeable;
+public interface Fortnite extends AutoCloseable {
 
-public interface Fortnite extends Closeable {
+    @Override
+    void close();
 
     AccountResource account();
 
     LeaderBoardResource leaderBoard();
 
-    StatisticsResource statistics();
+    StatisticResource statistic();
 }
