@@ -18,17 +18,24 @@ final class DefaultAccountResource implements AccountResource {
     private static final URI SINGLE_ACCOUNT_URI = URI.create("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup?q=");
     private static final URI MULTIPLE_ACCOUNTS_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account?");
     private final HttpClient httpClient;
+    private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
     private final Supplier<String> accessTokenSupplier;
 
     private DefaultAccountResource(HttpClient httpClient,
+                                   OptionalResponseHandlerProvider optionalResponseHandlerProvider,
                                    Supplier<String> accessTokenSupplier) {
         this.httpClient = httpClient;
+        this.optionalResponseHandlerProvider = optionalResponseHandlerProvider;
         this.accessTokenSupplier = accessTokenSupplier;
     }
 
     static DefaultAccountResource newInstance(HttpClient httpClient,
+                                              OptionalResponseHandlerProvider optionalResponseHandlerProvider,
                                               Supplier<String> sessionTokenSupplier) {
-        return new DefaultAccountResource(httpClient, sessionTokenSupplier);
+        return new DefaultAccountResource(
+                httpClient,
+                optionalResponseHandlerProvider,
+                sessionTokenSupplier);
     }
 
     @Override
@@ -38,7 +45,7 @@ final class DefaultAccountResource implements AccountResource {
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessTokenSupplier.get()));
         return httpClient.execute(
                 httpGet,
-                ResponseHandlerProvider.INSTANCE.responseHandlerForClass(DefaultAccount.class)
+                optionalResponseHandlerProvider.forClass(DefaultAccount.class)
         )
                 .map(Function.identity());
     }
@@ -61,7 +68,7 @@ final class DefaultAccountResource implements AccountResource {
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessTokenSupplier.get()));
         return httpClient.execute(
                 httpGet,
-                ResponseHandlerProvider.INSTANCE.responseHandlerForClass(DefaultAccount[].class)
+                optionalResponseHandlerProvider.forClass(DefaultAccount[].class)
         )
                 .map(accounts -> new HashSet<>(Arrays.asList(accounts)));
     }

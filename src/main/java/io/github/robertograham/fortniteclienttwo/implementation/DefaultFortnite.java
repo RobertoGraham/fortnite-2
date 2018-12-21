@@ -30,11 +30,26 @@ public final class DefaultFortnite implements Fortnite {
         fortniteClientToken = builder.fortniteClientToken;
         httpClient = HttpClientBuilder.create()
                 .build();
-        authenticationResource = AuthenticationResource.newInstance(httpClient);
+        authenticationResource = AuthenticationResource.newInstance(
+                httpClient,
+                JsonOptionalResponseHandlerProvider.INSTANCE
+        );
         sessionToken = fetchSessionToken();
-        accountResource = DefaultAccountResource.newInstance(httpClient, this::nonExpiredAccessToken);
-        leaderBoardResource = DefaultLeaderBoardResource.newInstance(httpClient, this::nonExpiredAccessToken);
-        statisticResource = DefaultStatisticResource.newInstance(httpClient, this::nonExpiredAccessToken);
+        accountResource = DefaultAccountResource.newInstance(
+                httpClient,
+                JsonOptionalResponseHandlerProvider.INSTANCE,
+                this::nonExpiredAccessToken
+        );
+        leaderBoardResource = DefaultLeaderBoardResource.newInstance(
+                httpClient,
+                JsonOptionalResponseHandlerProvider.INSTANCE,
+                this::nonExpiredAccessToken
+        );
+        statisticResource = DefaultStatisticResource.newInstance(
+                httpClient,
+                JsonOptionalResponseHandlerProvider.INSTANCE,
+                this::nonExpiredAccessToken
+        );
     }
 
     private Token fetchSessionToken() throws IOException {

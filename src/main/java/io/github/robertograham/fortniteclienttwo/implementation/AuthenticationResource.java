@@ -25,13 +25,20 @@ final class AuthenticationResource {
     private static final NameValuePair TOKEN_TYPE_EG1 = new BasicNameValuePair("token_type", "eg1");
     private static final NameValuePair INCLUDE_PERMS_TRUE = new BasicNameValuePair("includePerms", String.valueOf(true));
     private final HttpClient httpClient;
+    private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
 
-    private AuthenticationResource(HttpClient httpClient) {
+    private AuthenticationResource(HttpClient httpClient,
+                                   OptionalResponseHandlerProvider optionalResponseHandlerProvider) {
         this.httpClient = httpClient;
+        this.optionalResponseHandlerProvider = optionalResponseHandlerProvider;
     }
 
-    static AuthenticationResource newInstance(HttpClient httpClient) {
-        return new AuthenticationResource(httpClient);
+    static AuthenticationResource newInstance(HttpClient httpClient,
+                                              OptionalResponseHandlerProvider optionalResponseHandlerProvider) {
+        return new AuthenticationResource(
+                httpClient,
+                optionalResponseHandlerProvider
+        );
     }
 
     private Optional<Token> postForToken(String authorizationHeaderToken,
@@ -45,7 +52,7 @@ final class AuthenticationResource {
         );
         return httpClient.execute(
                 httpPost,
-                ResponseHandlerProvider.INSTANCE.responseHandlerForClass(Token.class)
+                optionalResponseHandlerProvider.forClass(Token.class)
         );
     }
 
@@ -64,7 +71,7 @@ final class AuthenticationResource {
         httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessToken));
         return httpClient.execute(
                 httpGet,
-                ResponseHandlerProvider.INSTANCE.responseHandlerForClass(Exchange.class)
+                optionalResponseHandlerProvider.forClass(Exchange.class)
         );
     }
 
@@ -98,7 +105,7 @@ final class AuthenticationResource {
         httpDelete.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessToken));
         httpClient.execute(
                 httpDelete,
-                ResponseHandlerProvider.STRING_OPTIONAL_RESPONSE_HANDLER
+                optionalResponseHandlerProvider.forString()
         );
     }
 }
