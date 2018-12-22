@@ -1,12 +1,12 @@
-# fortnite-client-two
+# fortnite-2
 
 ### Instantiating a client
 
 This is the simplest way to instantiate a client:
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
@@ -20,8 +20,8 @@ public class Main {
 If Epic Games ever deprecate this library's default launcher and client tokens, you may provide newer ones like this:
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
@@ -41,8 +41,8 @@ the client's underlying resources with a call to `Fortnite.close()`. Usage examp
 this call implicitly using `try`-with-resources statements.
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
@@ -57,9 +57,9 @@ public class Main {
 ### Getting an account using its display name
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.domain.Account;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -86,9 +86,9 @@ public class Main {
 ### Getting multiple accounts using their account IDs
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.domain.Account;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -125,10 +125,10 @@ public class Main {
 Most basic filtering - by time windows
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.domain.Account;
-import io.github.robertograham.fortniteclienttwo.domain.FilterableStatistic;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.domain.FilterableStatistic;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
 
@@ -168,16 +168,16 @@ public class Main {
 Filtering by platform, then party type
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.domain.Account;
-import io.github.robertograham.fortniteclienttwo.domain.PartyTypeFilterableStatistic;
-import io.github.robertograham.fortniteclienttwo.domain.Statistic;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.domain.PartyTypeFilterableStatistic;
+import io.github.robertograham.fortnite2.domain.Statistic;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
 
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.PartyType.SQUAD;
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.PC;
+import static io.github.robertograham.fortnite2.domain.enumeration.PartyType.SQUAD;
+import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PC;
 
 public class Main {
 
@@ -203,16 +203,16 @@ public class Main {
 Filtering by party type, then platform
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.domain.Account;
-import io.github.robertograham.fortniteclienttwo.domain.PlatformFilterableStatistic;
-import io.github.robertograham.fortniteclienttwo.domain.Statistic;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.domain.PlatformFilterableStatistic;
+import io.github.robertograham.fortnite2.domain.Statistic;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
 
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.PartyType.SOLO;
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.PS4;
+import static io.github.robertograham.fortnite2.domain.enumeration.PartyType.SOLO;
+import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PS4;
 
 public class Main {
 
@@ -238,15 +238,15 @@ public class Main {
 Inline platform and party type chained filter
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.domain.Account;
-import io.github.robertograham.fortniteclienttwo.domain.Statistic;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.domain.Statistic;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
 
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.PartyType.DUO;
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.XB1;
+import static io.github.robertograham.fortnite2.domain.enumeration.PartyType.DUO;
+import static io.github.robertograham.fortnite2.domain.enumeration.Platform.XB1;
 
 public class Main {
 
@@ -277,16 +277,16 @@ means that you can make calls like `Statistic.kills()`, `Statistic.wins()`, etc.
 and narrower scoped values
 
 ```java
-import io.github.robertograham.fortniteclienttwo.client.Fortnite;
-import io.github.robertograham.fortniteclienttwo.domain.*;
-import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.*;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
 import java.util.Optional;
 
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.PartyType.SOLO;
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.PC;
-import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.PS4;
+import static io.github.robertograham.fortnite2.domain.enumeration.PartyType.SOLO;
+import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PC;
+import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PS4;
 
 public class Main {
 
