@@ -38,17 +38,18 @@ public final class DefaultFortnite implements Fortnite {
         accountResource = DefaultAccountResource.newInstance(
                 httpClient,
                 JsonOptionalResponseHandlerProvider.INSTANCE,
-                this::nonExpiredAccessToken
+                () -> nonExpiredSessionToken().accessToken()
         );
         leaderBoardResource = DefaultLeaderBoardResource.newInstance(
                 httpClient,
                 JsonOptionalResponseHandlerProvider.INSTANCE,
-                this::nonExpiredAccessToken
+                () -> nonExpiredSessionToken().accessToken(),
+                () -> nonExpiredSessionToken().inAppId()
         );
         statisticResource = DefaultStatisticResource.newInstance(
                 httpClient,
                 JsonOptionalResponseHandlerProvider.INSTANCE,
-                this::nonExpiredAccessToken
+                () -> nonExpiredSessionToken().accessToken()
         );
     }
 
@@ -70,10 +71,10 @@ public final class DefaultFortnite implements Fortnite {
                 .orElseThrow(() -> new IllegalStateException("Couldn't establish a session"));
     }
 
-    private String nonExpiredAccessToken() {
+    private Token nonExpiredSessionToken() {
         if (sessionToken.isExpired())
             refreshSessionToken();
-        return sessionToken.accessToken();
+        return sessionToken;
     }
 
     private void refreshSessionToken() {
@@ -108,7 +109,7 @@ public final class DefaultFortnite implements Fortnite {
     public void close() {
         // TODO log exceptions
         try {
-            authenticationResource.retireAccessToken(nonExpiredAccessToken());
+            authenticationResource.retireAccessToken(nonExpiredSessionToken().accessToken());
         } catch (IOException ignored) {
         }
         try {

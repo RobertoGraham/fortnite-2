@@ -324,3 +324,69 @@ public class Main {
     }
 }
 ```
+
+### Leader board API
+
+Fetch the current season's wins leader board and print the accounts' names and wins. The example prints the following at 
+the time of writing:
+
+```text
+Name: JohnPitterTV, Wins: 350
+Name: TTV SwitchUMG, Wins: 251
+Name: Twitch TheBigOCE, Wins: 201
+Name: WE_桃子, Wins: 197
+Name: BlossoM Tsunami, Wins: 182
+```
+
+```java
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.domain.LeaderBoardEntry;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static io.github.robertograham.fortnite2.domain.enumeration.PartyType.SOLO;
+import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PC;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (Fortnite fortnite = builder.build()) {
+            List<LeaderBoardEntry> entries = fortnite.leaderBoard()
+                    .findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason(PC, SOLO, 5)
+                    .orElseThrow(IllegalStateException::new);
+            Map<String, Account> accountIdToAccountMap = fortnite.account()
+                    .findAllByAccountIds(
+                            entries.stream()
+                                    .map(LeaderBoardEntry::accountId)
+                                    .map(accountId -> accountId.replaceAll("-", ""))
+                                    .toArray(String[]::new)
+                    )
+                    .map(accounts ->
+                            accounts.stream()
+                                    .collect(Collectors.toMap(Account::accountId, Function.identity()))
+                    )
+                    .orElseThrow(IllegalStateException::new);
+            entries.stream()
+                    .map(leaderBoardEntry ->
+                            String.format(
+                                    "Name: %s, Wins: %d",
+                                    accountIdToAccountMap.get(leaderBoardEntry.accountId().replaceAll("-", "")).displayName(),
+                                    leaderBoardEntry.value()
+                            )
+                    )
+                    .forEach(System.out::println);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            // findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason unexpected response
+            // OR findAllByAccountIds unexpected response
+        }
+    }
+}
+```

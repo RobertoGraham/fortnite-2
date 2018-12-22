@@ -17,7 +17,9 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
             Token.Adapter.INSTANCE,
             Exchange.Adapter.INSTANCE,
             DefaultAccount.Adapter.INSTANCE,
-            RawStatistic.Adapter.INSTANCE
+            RawStatistic.Adapter.INSTANCE,
+            Cohort.Adapter.INSTANCE,
+            RawLeaderBoard.Adapter.INSTANCE
     );
 
     private final ResponseHandler<Optional<String>> stringOptionalHandler;

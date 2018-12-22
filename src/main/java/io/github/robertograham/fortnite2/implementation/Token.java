@@ -12,13 +12,16 @@ final class Token {
     private final String accessToken;
     private final LocalDateTime expiresAt;
     private final String refreshToken;
+    private final String inAppId;
 
     private Token(String accessToken,
                   LocalDateTime expiresAt,
-                  String refreshToken) {
+                  String refreshToken,
+                  String inAppId) {
         this.accessToken = accessToken;
         this.expiresAt = expiresAt;
         this.refreshToken = refreshToken;
+        this.inAppId = inAppId;
     }
 
     String accessToken() {
@@ -27,6 +30,10 @@ final class Token {
 
     String refreshToken() {
         return refreshToken;
+    }
+
+    String inAppId() {
+        return inAppId;
     }
 
     boolean isExpired() {
@@ -40,6 +47,7 @@ final class Token {
                 "accessToken='" + accessToken + '\'' +
                 ", expiresAt=" + expiresAt +
                 ", refreshToken='" + refreshToken + '\'' +
+                ", inAppId='" + inAppId + '\'' +
                 '}';
     }
 
@@ -52,12 +60,13 @@ final class Token {
         Token token = (Token) object;
         return accessToken.equals(token.accessToken) &&
                 expiresAt.equals(token.expiresAt) &&
-                refreshToken.equals(token.refreshToken);
+                refreshToken.equals(token.refreshToken) &&
+                inAppId.equals(token.inAppId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accessToken, expiresAt, refreshToken);
+        return Objects.hash(accessToken, expiresAt, refreshToken, inAppId);
     }
 
     enum Adapter implements JsonbAdapter<Token, JsonObject> {
@@ -77,7 +86,8 @@ final class Token {
                             Instant.parse(jsonObject.getString("expires_at")),
                             ZoneOffset.UTC
                     ),
-                    jsonObject.getString("refresh_token")
+                    jsonObject.getString("refresh_token"),
+                    jsonObject.getString("in_app_id")
             );
         }
     }
