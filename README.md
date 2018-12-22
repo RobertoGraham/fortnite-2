@@ -275,3 +275,52 @@ public class Main {
 `FilterableStatistic`, `PartyTypeFilterableStatistic`, and `PlatformFilterableStatistic` all extend `Statistic`. This 
 means that you can make calls like `Statistic.kills()`, `Statistic.wins()`, etc. at each filtering stage to get narrower 
 and narrower scoped values
+
+```java
+import io.github.robertograham.fortniteclienttwo.client.Fortnite;
+import io.github.robertograham.fortniteclienttwo.domain.*;
+import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+import java.util.Optional;
+
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.PartyType.SOLO;
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.PC;
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.PS4;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (Fortnite fortnite = builder.build()) {
+            Account account = fortnite.account()
+                    .findOneByDisplayName("RobertoGraham")
+                    .orElseThrow(IllegalStateException::new);
+            Optional<FilterableStatistic> filterableStatistic = fortnite.statistic()
+                    .findAllByAccountForAllTime(account);
+            // prints 761 at time of writing
+            filterableStatistic.map(FilterableStatistic::kills)
+                    .ifPresent(System.out::println);
+            // prints 5 at time of writing
+            filterableStatistic.map(filterable -> filterable.byPlatform(PC))
+                    .map(PartyTypeFilterableStatistic::kills)
+                    .ifPresent(System.out::println);
+            // prints 580 at time of writing
+            filterableStatistic.map(filterable -> filterable.byPartyType(SOLO))
+                    .map(PlatformFilterableStatistic::kills)
+                    .ifPresent(System.out::println);
+            // prints 575 at time of writing
+            filterableStatistic.map(filterable ->
+                    filterable
+                            .byPlatform(PS4)
+                            .byPartyType(SOLO)
+            )
+                    .map(Statistic::kills)
+                    .ifPresent(System.out::println);
+        } catch (IOException exception) {
+            // findOneByDisplayName unexpected response
+            // OR findAllByAccountForAllTime unexpected response
+        }
+    }
+}
+```
