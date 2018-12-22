@@ -18,12 +18,11 @@ final class AuthenticationResource {
 
     private static final URI TOKEN_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/token");
     private static final URI EXCHANGE_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/exchange");
-    private static final URI KILL_TOKEN_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/sessions/kill/");
+    private static final URI KILL_TOKEN_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/sessions/kill");
     private static final NameValuePair GRANT_TYPE_PASSWORD = new BasicNameValuePair("grant_type", "password");
     private static final NameValuePair GRANT_TYPE_EXCHANGE_CODE = new BasicNameValuePair("grant_type", "exchange_code");
     private static final NameValuePair GRANT_TYPE_REFRESH_TOKEN = new BasicNameValuePair("grant_type", "refresh_token");
     private static final NameValuePair TOKEN_TYPE_EG1 = new BasicNameValuePair("token_type", "eg1");
-    private static final NameValuePair INCLUDE_PERMS_TRUE = new BasicNameValuePair("includePerms", String.valueOf(true));
     private final HttpClient httpClient;
     private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
 
@@ -60,7 +59,6 @@ final class AuthenticationResource {
         return postForToken(
                 epicGamesLauncherToken,
                 GRANT_TYPE_PASSWORD,
-                INCLUDE_PERMS_TRUE,
                 new BasicNameValuePair("username", epicGamesEmailAddress),
                 new BasicNameValuePair("password", epicGamesPassword)
         );
@@ -80,7 +78,6 @@ final class AuthenticationResource {
                 fortniteClientToken,
                 GRANT_TYPE_EXCHANGE_CODE,
                 TOKEN_TYPE_EG1,
-                INCLUDE_PERMS_TRUE,
                 new BasicNameValuePair("exchange_code", exchangeCode)
         );
     }
@@ -89,7 +86,6 @@ final class AuthenticationResource {
         return postForToken(
                 fortniteClientToken,
                 GRANT_TYPE_REFRESH_TOKEN,
-                INCLUDE_PERMS_TRUE,
                 new BasicNameValuePair("refresh_token", refreshToken)
         );
     }
@@ -97,7 +93,7 @@ final class AuthenticationResource {
     void retireAccessToken(String accessToken) throws IOException {
         final HttpDelete httpDelete = new HttpDelete(
                 String.format(
-                        "%s%s",
+                        "%s/%s",
                         KILL_TOKEN_URI,
                         accessToken
                 )
