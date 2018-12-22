@@ -120,3 +120,158 @@ public class Main {
 }
 ```
 
+### Statistic filtering API
+
+Most basic filtering - by time windows
+
+```java
+import io.github.robertograham.fortniteclienttwo.client.Fortnite;
+import io.github.robertograham.fortniteclienttwo.domain.Account;
+import io.github.robertograham.fortniteclienttwo.domain.FilterableStatistic;
+import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (Fortnite fortnite = builder.build()) {
+            Account account = fortnite.account()
+                    .findOneByDisplayName("RobertoGraham")
+                    .orElseThrow(IllegalStateException::new);
+            String accountId = account.accountId();
+            // if any null then we received an empty response
+            FilterableStatistic fromAccountAllTime = fortnite.statistic()
+                    .findAllByAccountForAllTime(account)
+                    .orElse(null);
+            FilterableStatistic fromAccountIdAllTime = fortnite.statistic()
+                    .findAllByAccountIdForAllTime(accountId)
+                    .orElse(null);
+            FilterableStatistic fromAccountCurrentSeason = fortnite.statistic()
+                    .findAllByAccountForCurrentSeason(account)
+                    .orElse(null);
+            FilterableStatistic fromAccountIdCurrentSeason = fortnite.statistic()
+                    .findAllByAccountIdForCurrentSeason(accountId)
+                    .orElse(null);
+        } catch (IOException exception) {
+            // findOneByDisplayName unexpected response
+            // OR findAllByAccountForAllTime unexpected response
+            // OR findAllByAccountIdForAllTime unexpected response
+            // OR findAllByAccountForCurrentSeason unexpected response
+            // OR findAllByAccountIdForCurrentSeason unexpected response
+        }
+    }
+}
+```
+
+Filtering by platform, then party type
+
+```java
+import io.github.robertograham.fortniteclienttwo.client.Fortnite;
+import io.github.robertograham.fortniteclienttwo.domain.Account;
+import io.github.robertograham.fortniteclienttwo.domain.PartyTypeFilterableStatistic;
+import io.github.robertograham.fortniteclienttwo.domain.Statistic;
+import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.PartyType.SQUAD;
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.PC;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (Fortnite fortnite = builder.build()) {
+            Account account = fortnite.account()
+                    .findOneByDisplayName("RobertoGraham")
+                    .orElseThrow(IllegalStateException::new);
+            PartyTypeFilterableStatistic onePlatformPartyFilterable = fortnite.statistic()
+                    .findAllByAccountForAllTime(account)
+                    .map(filterableStatistic -> filterableStatistic.byPlatform(PC))
+                    .orElseThrow(IllegalStateException::new);
+            Statistic onePlatformOnePartyType = onePlatformPartyFilterable.byPartyType(SQUAD);
+        } catch (IOException exception) {
+            // findOneByDisplayName unexpected response
+            // OR findAllByAccountForAllTime unexpected response
+        }
+    }
+}
+```
+
+Filtering by party type, then platform
+
+```java
+import io.github.robertograham.fortniteclienttwo.client.Fortnite;
+import io.github.robertograham.fortniteclienttwo.domain.Account;
+import io.github.robertograham.fortniteclienttwo.domain.PlatformFilterableStatistic;
+import io.github.robertograham.fortniteclienttwo.domain.Statistic;
+import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.PartyType.SOLO;
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.PS4;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (Fortnite fortnite = builder.build()) {
+            Account account = fortnite.account()
+                    .findOneByDisplayName("RobertoGraham")
+                    .orElseThrow(IllegalStateException::new);
+            PlatformFilterableStatistic onePartyTypePlatformFilterable = fortnite.statistic()
+                    .findAllByAccountForAllTime(account)
+                    .map(filterableStatistic -> filterableStatistic.byPartyType(SOLO))
+                    .orElseThrow(IllegalStateException::new);
+            Statistic onePartyTypeOnePlatform = onePartyTypePlatformFilterable.byPlatform(PS4);
+        } catch (IOException exception) {
+            // findOneByDisplayName unexpected response
+            // OR findAllByAccountForAllTime unexpected response
+        }
+    }
+}
+```
+
+Inline platform and party type chained filter
+
+```java
+import io.github.robertograham.fortniteclienttwo.client.Fortnite;
+import io.github.robertograham.fortniteclienttwo.domain.Account;
+import io.github.robertograham.fortniteclienttwo.domain.Statistic;
+import io.github.robertograham.fortniteclienttwo.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.PartyType.DUO;
+import static io.github.robertograham.fortniteclienttwo.domain.enumeration.Platform.XB1;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (Fortnite fortnite = builder.build()) {
+            Account account = fortnite.account()
+                    .findOneByDisplayName("RobertoGraham")
+                    .orElseThrow(IllegalStateException::new);
+            Statistic statistic = fortnite.statistic()
+                    .findAllByAccountForAllTime(account)
+                    .map(filterableStatistic ->
+                            filterableStatistic
+                                    .byPlatform(XB1)
+                                    .byPartyType(DUO)
+                    )
+                    .orElse(null);
+        } catch (IOException exception) {
+            // findOneByDisplayName unexpected response
+            // OR findAllByAccountForAllTime unexpected response
+        }
+    }
+}
+```
+
+`FilterableStatistic`, `PartyTypeFilterableStatistic`, and `PlatformFilterableStatistic` all extend `Statistic`. This
+means that you can make calls like `Statistic.kills()`, `Statistic.wins()`, etc. at each filtering stage to get narrower
+and narrower scoped values
