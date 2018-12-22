@@ -8,8 +8,8 @@ final class Exchange {
 
     private final String code;
 
-    private Exchange(JsonObject jsonObject) {
-        code = jsonObject.getString("code", null);
+    private Exchange(String code) {
+        this.code = code;
     }
 
     String code() {
@@ -49,7 +49,7 @@ final class Exchange {
 
         @Override
         public Exchange adaptFromJson(JsonObject jsonObject) {
-            return new Exchange(jsonObject);
+            return new Exchange(jsonObject.getString("code"));
         }
     }
 }

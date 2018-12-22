@@ -3,22 +3,13 @@ package io.github.robertograham.fortnite2.implementation;
 import io.github.robertograham.fortnite2.domain.Statistic;
 
 import java.util.Objects;
-import java.util.Set;
 
 abstract class ForwardingStatistic implements Statistic {
 
-    private final Set<RawStatistic> rawStatistics;
     private final Statistic statistic;
 
-    ForwardingStatistic(Set<RawStatistic> rawStatistics) {
-        this.rawStatistics = rawStatistics;
-        statistic = rawStatistics.isEmpty() ?
-                EmptyStatistic.INSTANCE
-                : new DefaultStatistic(this.rawStatistics);
-    }
-
-    final Set<RawStatistic> rawStatistics() {
-        return rawStatistics;
+    ForwardingStatistic(Statistic statistic) {
+        this.statistic = statistic;
     }
 
     @Override
@@ -74,24 +65,22 @@ abstract class ForwardingStatistic implements Statistic {
     @Override
     public String toString() {
         return "ForwardingStatistic{" +
-                "rawStatistics=" + rawStatistics +
-                ", statistic=" + statistic +
+                "statistic=" + statistic +
                 '}';
     }
 
     @Override
-    public final boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (this == object)
             return true;
         if (!(object instanceof ForwardingStatistic))
             return false;
         ForwardingStatistic forwardingStatistic = (ForwardingStatistic) object;
-        return rawStatistics.equals(forwardingStatistic.rawStatistics) &&
-                statistic.equals(forwardingStatistic.statistic);
+        return statistic.equals(forwardingStatistic.statistic);
     }
 
     @Override
-    public final int hashCode() {
-        return Objects.hash(rawStatistics, statistic);
+    public int hashCode() {
+        return Objects.hash(statistic);
     }
 }

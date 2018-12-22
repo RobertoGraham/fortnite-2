@@ -11,9 +11,10 @@ final class DefaultAccount implements Account {
     private final String accountId;
     private final String displayName;
 
-    private DefaultAccount(JsonObject jsonObject) {
-        accountId = jsonObject.getString("id", null);
-        displayName = jsonObject.getString("displayName", null);
+    private DefaultAccount(String accountId,
+                           String displayName) {
+        this.accountId = accountId;
+        this.displayName = displayName;
     }
 
     @Override
@@ -61,7 +62,10 @@ final class DefaultAccount implements Account {
 
         @Override
         public DefaultAccount adaptFromJson(JsonObject jsonObject) {
-            return new DefaultAccount(jsonObject);
+            return new DefaultAccount(
+                    jsonObject.getString("id", null),
+                    jsonObject.getString("displayName", null)
+            );
         }
     }
 }

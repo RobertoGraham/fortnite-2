@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
-import java.util.Optional;
 
 final class Token {
 
@@ -14,17 +13,12 @@ final class Token {
     private final LocalDateTime expiresAt;
     private final String refreshToken;
 
-    private Token(JsonObject jsonObject) {
-        accessToken = jsonObject.getString("access_token", null);
-        expiresAt = Optional.ofNullable(jsonObject.getString("expires_at", null))
-                .map(expiresAt ->
-                        LocalDateTime.ofInstant(
-                                Instant.parse(expiresAt),
-                                ZoneOffset.UTC
-                        )
-                )
-                .orElse(null);
-        refreshToken = jsonObject.getString("refresh_token", null);
+    private Token(String accessToken,
+                  LocalDateTime expiresAt,
+                  String refreshToken) {
+        this.accessToken = accessToken;
+        this.expiresAt = expiresAt;
+        this.refreshToken = refreshToken;
     }
 
     String accessToken() {
@@ -36,9 +30,8 @@ final class Token {
     }
 
     boolean isExpired() {
-        return Optional.ofNullable(expiresAt)
-                .map(LocalDateTime.now()::isAfter)
-                .orElse(true);
+        return LocalDateTime.now()
+                .isAfter(expiresAt);
     }
 
     @Override
@@ -57,9 +50,9 @@ final class Token {
         if (!(object instanceof Token))
             return false;
         Token token = (Token) object;
-        return Objects.equals(accessToken, token.accessToken) &&
-                Objects.equals(expiresAt, token.expiresAt) &&
-                Objects.equals(refreshToken, token.refreshToken);
+        return accessToken.equals(token.accessToken) &&
+                expiresAt.equals(token.expiresAt) &&
+                refreshToken.equals(token.refreshToken);
     }
 
     @Override
@@ -78,7 +71,14 @@ final class Token {
 
         @Override
         public Token adaptFromJson(JsonObject jsonObject) {
-            return new Token(jsonObject);
+            return new Token(
+                    jsonObject.getString("access_token"),
+                    LocalDateTime.ofInstant(
+                            Instant.parse(jsonObject.getString("expires_at")),
+                            ZoneOffset.UTC
+                    ),
+                    jsonObject.getString("refresh_token")
+            );
         }
     }
 }

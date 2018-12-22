@@ -1,12 +1,14 @@
 package io.github.robertograham.fortnite2.implementation;
 
+import io.github.robertograham.fortnite2.domain.Statistic;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
-final class DefaultStatistic implements io.github.robertograham.fortnite2.domain.Statistic {
+final class DefaultStatistic implements Statistic {
 
     private final long wins;
     private final long matches;
@@ -20,13 +22,14 @@ final class DefaultStatistic implements io.github.robertograham.fortnite2.domain
     private final long timesPlacedTop6;
 
     DefaultStatistic(Set<RawStatistic> rawStatistics) {
-        final Map<String, Long> summedValuesGroupedByStatType = rawStatistics.stream()
-                .collect(
-                        Collectors.groupingBy(
-                                RawStatistic::statType,
-                                Collectors.summingLong(RawStatistic::value)
-                        )
-                );
+        final Map<String, Long> summedValuesGroupedByStatType =
+                rawStatistics.stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        RawStatistic::type,
+                                        Collectors.summingLong(RawStatistic::value)
+                                )
+                        );
         wins = summedValuesGroupedByStatType.getOrDefault("placetop1", 0L);
         matches = summedValuesGroupedByStatType.getOrDefault("matchesplayed", 0L);
         kills = summedValuesGroupedByStatType.getOrDefault("kills", 0L);

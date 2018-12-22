@@ -1,30 +1,28 @@
 package io.github.robertograham.fortnite2.implementation;
 
-import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.bind.adapter.JsonbAdapter;
 import java.util.Objects;
-import java.util.Optional;
 
 final class RawStatistic {
 
-    private final String statType;
+    private final String type;
     private final String platform;
     private final String partyType;
     private final long value;
 
-    private RawStatistic(JsonObject jsonObject) {
-        final String[] nameParts = jsonObject.getString("name", "____").split("_");
-        statType = nameParts[1];
-        platform = nameParts[2];
-        partyType = nameParts[4];
-        value = Optional.ofNullable(jsonObject.getJsonNumber("value"))
-                .map(JsonNumber::longValueExact)
-                .orElse(0L);
+    private RawStatistic(String type,
+                         String platform,
+                         String partyType,
+                         long value) {
+        this.type = type;
+        this.platform = platform;
+        this.partyType = partyType;
+        this.value = value;
     }
 
-    String statType() {
-        return statType;
+    String type() {
+        return type;
     }
 
     String platform() {
@@ -42,7 +40,7 @@ final class RawStatistic {
     @Override
     public String toString() {
         return "RawStatistic{" +
-                "statType='" + statType + '\'' +
+                "type='" + type + '\'' +
                 ", platform='" + platform + '\'' +
                 ", partyType='" + partyType + '\'' +
                 ", value=" + value +
@@ -57,14 +55,14 @@ final class RawStatistic {
             return false;
         RawStatistic rawStatistic = (RawStatistic) object;
         return value == rawStatistic.value &&
-                statType.equals(rawStatistic.statType) &&
+                type.equals(rawStatistic.type) &&
                 platform.equals(rawStatistic.platform) &&
                 partyType.equals(rawStatistic.partyType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(statType, platform, partyType, value);
+        return Objects.hash(type, platform, partyType, value);
     }
 
     enum Adapter implements JsonbAdapter<RawStatistic, JsonObject> {
@@ -78,7 +76,15 @@ final class RawStatistic {
 
         @Override
         public RawStatistic adaptFromJson(JsonObject jsonObject) {
-            return new RawStatistic(jsonObject);
+            final String[] nameParts =
+                    jsonObject.getString("name")
+                            .split("_");
+            return new RawStatistic(
+                    nameParts[1],
+                    nameParts[2],
+                    nameParts[4],
+                    jsonObject.getJsonNumber("value").longValueExact()
+            );
         }
     }
 }
