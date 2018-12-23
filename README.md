@@ -1,5 +1,7 @@
 # fortnite-2
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.robertograham/fortnite-2.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.robertograham%22%20AND%20a:%22fortnite-2%22)
+
 ### Instantiating a client
 
 This is the simplest way to instantiate a client:
