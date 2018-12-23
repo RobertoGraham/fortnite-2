@@ -10,7 +10,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>fortnite-2</name>
+    <name>${project.groupId}:${project.artifactId}</name>
     <description>Fortnite API client</description>
     <url>https://github.com/RobertoGraham/fortnite-2</url>
 
