@@ -30,9 +30,9 @@
     </developers>
 
     <scm>
+        <url>https://github.com/RobertoGraham/fortnite-2</url>
         <connection>scm:git:git://github.com/RobertoGraham/fortnite-2.git</connection>
-        <developerConnection>scm:git:ssh://github.com/RobertoGraham/fortnite-2.git</developerConnection>
-        <url>https://github.com/RobertoGraham/fortnite-2/tree/master</url>
+        <developerConnection>scm:git:git@github.com:RobertoGraham/fortnite-2.git</developerConnection>
     </scm>
 
     <distributionManagement>
