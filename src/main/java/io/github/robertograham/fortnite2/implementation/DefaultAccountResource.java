@@ -12,11 +12,13 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 final class DefaultAccountResource implements AccountResource {
 
     private static final URI SINGLE_ACCOUNT_URI = URI.create("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup?q=");
     private static final URI MULTIPLE_ACCOUNTS_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account?");
+    private static final int MAX_ID_COUNT_PER_ACCOUNTS_REQUEST = 100;
     private final HttpClient httpClient;
     private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
     private final Supplier<String> accessTokenSupplier;
@@ -56,11 +58,42 @@ final class DefaultAccountResource implements AccountResource {
         if (Arrays.stream(accountIds)
                 .anyMatch(Objects::isNull))
             throw new NullPointerException("accountIds cannot contain null value");
+        final Set<Set<String>> accountIdsPartitioned = IntStream.range(0, accountIds.length)
+                .boxed()
+                .collect(
+                        Collectors.groupingBy(index ->
+                                index / MAX_ID_COUNT_PER_ACCOUNTS_REQUEST
+                        )
+                )
+                .values()
+                .stream()
+                .map(indices ->
+                        indices.stream()
+                                .map(index -> accountIds[index])
+                                .collect(Collectors.toSet())
+                )
+                .collect(Collectors.toSet());
+        final Set<Optional<Set<Account>>> optionalAccountSetSet = new HashSet<>();
+        for (final Set<String> accountIdPartition : accountIdsPartitioned)
+            optionalAccountSetSet.add(findAllByAccountIds(accountIdPartition));
+        return optionalAccountSetSet.stream()
+                .reduce((optionalAccountSetToAdd, optionalAccountSetAccumulator) ->
+                        optionalAccountSetAccumulator.map(accountSet -> {
+                            accountSet.addAll(
+                                    optionalAccountSetToAdd.orElseGet(HashSet::new)
+                            );
+                            return accountSet;
+                        })
+                )
+                .orElseGet(Optional::empty);
+    }
+
+    private Optional<Set<Account>> findAllByAccountIds(Set<String> accountIds) throws IOException {
         final HttpGet httpGet = new HttpGet(
                 String.format(
                         "%s%s",
                         MULTIPLE_ACCOUNTS_URI,
-                        Arrays.stream(accountIds)
+                        accountIds.stream()
                                 .map("accountId="::concat)
                                 .collect(Collectors.joining("&"))
                 )
