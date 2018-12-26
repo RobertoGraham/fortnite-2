@@ -12,15 +12,18 @@ final class Token {
     private final String accessToken;
     private final LocalDateTime expiresAt;
     private final String refreshToken;
+    private final LocalDateTime refreshExpiresAt;
     private final String inAppId;
 
     private Token(String accessToken,
                   LocalDateTime expiresAt,
                   String refreshToken,
+                  LocalDateTime refreshExpiresAt,
                   String inAppId) {
         this.accessToken = accessToken;
         this.expiresAt = expiresAt;
         this.refreshToken = refreshToken;
+        this.refreshExpiresAt = refreshExpiresAt;
         this.inAppId = inAppId;
     }
 
@@ -28,17 +31,20 @@ final class Token {
         return accessToken;
     }
 
+    LocalDateTime expiresAt() {
+        return expiresAt;
+    }
+
     String refreshToken() {
         return refreshToken;
     }
 
-    String inAppId() {
-        return inAppId;
+    LocalDateTime refreshExpiresAt() {
+        return refreshExpiresAt;
     }
 
-    boolean isExpired() {
-        return LocalDateTime.now()
-                .isAfter(expiresAt);
+    String inAppId() {
+        return inAppId;
     }
 
     @Override
@@ -47,6 +53,7 @@ final class Token {
                 "accessToken='" + accessToken + '\'' +
                 ", expiresAt=" + expiresAt +
                 ", refreshToken='" + refreshToken + '\'' +
+                ", refreshExpiresAt=" + refreshExpiresAt +
                 ", inAppId='" + inAppId + '\'' +
                 '}';
     }
@@ -61,12 +68,13 @@ final class Token {
         return accessToken.equals(token.accessToken) &&
                 expiresAt.equals(token.expiresAt) &&
                 refreshToken.equals(token.refreshToken) &&
+                refreshExpiresAt.equals(token.refreshExpiresAt) &&
                 inAppId.equals(token.inAppId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accessToken, expiresAt, refreshToken, inAppId);
+        return Objects.hash(accessToken, expiresAt, refreshToken, refreshExpiresAt, inAppId);
     }
 
     enum Adapter implements JsonbAdapter<Token, JsonObject> {
@@ -87,6 +95,10 @@ final class Token {
                             ZoneOffset.UTC
                     ),
                     jsonObject.getString("refresh_token"),
+                    LocalDateTime.ofInstant(
+                            Instant.parse(jsonObject.getString("refresh_expires_at")),
+                            ZoneOffset.UTC
+                    ),
                     jsonObject.getString("in_app_id")
             );
         }

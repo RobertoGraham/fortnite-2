@@ -3,26 +3,25 @@ package io.github.robertograham.fortnite2.implementation;
 import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.domain.FilterableStatistic;
 import io.github.robertograham.fortnite2.resource.StatisticResource;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
+
 final class DefaultStatisticResource implements StatisticResource {
 
-    private static final URI BATTLE_ROYALE_STATS_URI = URI.create("https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/stats/accountId");
-    private final HttpClient httpClient;
+    private final CloseableHttpClient httpClient;
     private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
     private final Supplier<String> accessTokenSupplier;
 
-    private DefaultStatisticResource(HttpClient httpClient,
+    private DefaultStatisticResource(CloseableHttpClient httpClient,
                                      OptionalResponseHandlerProvider optionalResponseHandlerProvider,
                                      Supplier<String> accessTokenSupplier) {
         this.httpClient = httpClient;
@@ -30,7 +29,7 @@ final class DefaultStatisticResource implements StatisticResource {
         this.accessTokenSupplier = accessTokenSupplier;
     }
 
-    static DefaultStatisticResource newInstance(HttpClient httpClient,
+    static DefaultStatisticResource newInstance(CloseableHttpClient httpClient,
                                                 OptionalResponseHandlerProvider optionalResponseHandlerProvider,
                                                 Supplier<String> sessionTokenSupplier) {
         return new DefaultStatisticResource(
@@ -41,17 +40,15 @@ final class DefaultStatisticResource implements StatisticResource {
     }
 
     private Optional<FilterableStatistic> findAllByAccountIdForWindow(String accountId, String window) throws IOException {
-        final HttpGet httpGet = new HttpGet(
-                String.format(
+        return httpClient.execute(
+                RequestBuilder.get(String.format(
                         "%s/%s/bulk/window/%s",
-                        BATTLE_ROYALE_STATS_URI,
+                        "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/stats/accountId",
                         accountId,
                         window
-                )
-        );
-        httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessTokenSupplier.get()));
-        return httpClient.execute(
-                httpGet,
+                ))
+                        .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
+                        .build(),
                 optionalResponseHandlerProvider.forClass(RawStatistic[].class)
         )
                 .map(rawStatistics -> new HashSet<>(Arrays.asList(rawStatistics)))

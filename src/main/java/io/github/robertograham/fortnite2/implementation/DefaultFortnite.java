@@ -5,10 +5,12 @@ import io.github.robertograham.fortnite2.resource.AccountResource;
 import io.github.robertograham.fortnite2.resource.LeaderBoardResource;
 import io.github.robertograham.fortnite2.resource.StatisticResource;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
 import java.util.Objects;
+
+import static java.time.LocalDateTime.now;
 
 public final class DefaultFortnite implements Fortnite {
 
@@ -28,8 +30,7 @@ public final class DefaultFortnite implements Fortnite {
         epicGamesPassword = builder.epicGamesPassword;
         epicGamesLauncherToken = builder.epicGamesLauncherToken;
         fortniteClientToken = builder.fortniteClientToken;
-        httpClient = HttpClientBuilder.create()
-                .build();
+        httpClient = HttpClients.createDefault();
         authenticationResource = AuthenticationResource.newInstance(
                 httpClient,
                 JsonOptionalResponseHandlerProvider.INSTANCE
@@ -60,33 +61,51 @@ public final class DefaultFortnite implements Fortnite {
                 epicGamesLauncherToken
         )
                 .map(Token::accessToken)
-                .orElseThrow(() -> new IllegalStateException("Couldn't retrieve an access token"));
+                .orElseThrow(() -> new IOException("Couldn't retrieve an access token"));
         final String exchangeCode = authenticationResource.accessTokenGrantedExchange(accessToken)
                 .map(Exchange::code)
-                .orElseThrow(() -> new IllegalStateException("Couldn't retrieve an exchange code"));
+                .orElseThrow(() -> new IOException("Couldn't retrieve an exchange code"));
         return authenticationResource.exchangeCodeGrantedToken(
                 exchangeCode,
                 fortniteClientToken
         )
-                .orElseThrow(() -> new IllegalStateException("Couldn't establish a session"));
+                .orElseThrow(() -> new IOException("Couldn't establish a session"));
     }
 
     private Token nonExpiredSessionToken() {
-        if (sessionToken.isExpired())
-            refreshSessionToken();
+        if (sessionToken.refreshExpiresAt()
+                .minusMinutes(5L)
+                .isBefore(now())) {
+            establishNewSession();
+        }
+        if (sessionToken.expiresAt()
+                .minusMinutes(5L)
+                .isBefore(now()))
+            refreshSession();
         return sessionToken;
     }
 
-    private void refreshSessionToken() {
+    private void establishNewSession() {
         try {
-            authenticationResource.refreshTokenGrantedToken(
+            String oldAccessToken = sessionToken.accessToken();
+            sessionToken = fetchSessionToken();
+            authenticationResource.retireAccessToken(oldAccessToken);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private void refreshSession() {
+        try {
+            String oldAccessToken = sessionToken.accessToken();
+            sessionToken = authenticationResource.refreshTokenGrantedToken(
                     sessionToken.refreshToken(),
                     fortniteClientToken
             )
-                    .ifPresent(refreshTokenGrantedToken ->
-                            this.sessionToken = refreshTokenGrantedToken
-                    );
-        } catch (IOException ignored) {
+                    .orElseThrow(() -> new IOException("Couldn't refresh session"));
+            authenticationResource.retireAccessToken(oldAccessToken);
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -110,11 +129,13 @@ public final class DefaultFortnite implements Fortnite {
         // TODO log exceptions
         try {
             authenticationResource.retireAccessToken(nonExpiredSessionToken().accessToken());
-        } catch (IOException ignored) {
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
         try {
             httpClient.close();
-        } catch (IOException ignored) {
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -149,8 +170,8 @@ public final class DefaultFortnite implements Fortnite {
         public Fortnite build() {
             try {
                 return new DefaultFortnite(this);
-            } catch (IOException e) {
-                throw new IllegalStateException("Authorisation error occurred when establishing session", e);
+            } catch (IOException exception) {
+                throw new IllegalStateException("Error occurred when establishing session", exception);
             }
         }
     }

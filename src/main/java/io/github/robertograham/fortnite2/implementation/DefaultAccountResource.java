@@ -2,28 +2,27 @@ package io.github.robertograham.fortnite2.implementation;
 
 import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.resource.AccountResource;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
+
 final class DefaultAccountResource implements AccountResource {
 
-    private static final URI SINGLE_ACCOUNT_URI = URI.create("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup?q=");
-    private static final URI MULTIPLE_ACCOUNTS_URI = URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account?");
     private static final int MAX_ID_COUNT_PER_ACCOUNTS_REQUEST = 100;
-    private final HttpClient httpClient;
+    private final CloseableHttpClient httpClient;
     private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
     private final Supplier<String> accessTokenSupplier;
 
-    private DefaultAccountResource(HttpClient httpClient,
+    private DefaultAccountResource(CloseableHttpClient httpClient,
                                    OptionalResponseHandlerProvider optionalResponseHandlerProvider,
                                    Supplier<String> accessTokenSupplier) {
         this.httpClient = httpClient;
@@ -31,7 +30,7 @@ final class DefaultAccountResource implements AccountResource {
         this.accessTokenSupplier = accessTokenSupplier;
     }
 
-    static DefaultAccountResource newInstance(HttpClient httpClient,
+    static DefaultAccountResource newInstance(CloseableHttpClient httpClient,
                                               OptionalResponseHandlerProvider optionalResponseHandlerProvider,
                                               Supplier<String> sessionTokenSupplier) {
         return new DefaultAccountResource(
@@ -43,10 +42,11 @@ final class DefaultAccountResource implements AccountResource {
     @Override
     public Optional<Account> findOneByDisplayName(String displayName) throws IOException {
         Objects.requireNonNull(displayName, "displayName cannot be null");
-        final HttpGet httpGet = new HttpGet(String.format("%s%s", SINGLE_ACCOUNT_URI, displayName));
-        httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessTokenSupplier.get()));
         return httpClient.execute(
-                httpGet,
+                RequestBuilder.get("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup")
+                        .addParameter("q", displayName)
+                        .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
+                        .build(),
                 optionalResponseHandlerProvider.forClass(DefaultAccount.class)
         )
                 .map(Function.identity());
@@ -89,18 +89,15 @@ final class DefaultAccountResource implements AccountResource {
     }
 
     private Optional<Set<Account>> findAllByAccountIds(Set<String> accountIds) throws IOException {
-        final HttpGet httpGet = new HttpGet(
-                String.format(
-                        "%s%s",
-                        MULTIPLE_ACCOUNTS_URI,
-                        accountIds.stream()
-                                .map("accountId="::concat)
-                                .collect(Collectors.joining("&"))
-                )
-        );
-        httpGet.setHeader(HttpHeaders.AUTHORIZATION, String.format("bearer %s", accessTokenSupplier.get()));
         return httpClient.execute(
-                httpGet,
+                RequestBuilder.get("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account")
+                        .addParameters(
+                                accountIds.stream()
+                                        .map(accountId -> new BasicNameValuePair("accountId", accountId))
+                                        .toArray(BasicNameValuePair[]::new)
+                        )
+                        .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
+                        .build(),
                 optionalResponseHandlerProvider.forClass(DefaultAccount[].class)
         )
                 .map(accounts -> new HashSet<>(Arrays.asList(accounts)));
