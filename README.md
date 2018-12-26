@@ -1,6 +1,40 @@
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.robertograham/fortnite-2.svg?label=Maven%20Central&style=flat-square)](https://search.maven.org/search?q=g:%22io.github.robertograham%22%20AND%20a:%22fortnite-2%22)
+
 # fortnite-2
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.robertograham/fortnite-2.svg?label=Maven%20Central&style=flat-square)](https://search.maven.org/search?q=g:%22io.github.robertograham%22%20AND%20a:%22fortnite-2%22)
+A Java 8+ client for the APIs used by Epic Games Launcher and the Fortnite client
+
+Features:
+
+* Authentication with Epic's APIs is managed internally
+* Fetching and filtering (by platform, party type, and time window) of an account's Battle Royale statistics
+* Fetching of all-time win leader boards using different combinations of platform and party type
+* Fetching of a single account via its username or many accounts via their IDs
+
+## Installation
+
+### Maven
+
+```xml
+<properties>
+  ...
+  <!-- Use the latest version whenever possible. -->
+  <fortnite-2.version>1.0.1</fortnite2.version>
+  ...
+</properties>
+
+<dependencies>
+  ...
+  <dependency>
+    <groupId>io.github.robertograham</groupId>
+    <artifactId>fortnite-2</artifactId>
+    <version>${fortnite-2.version}</version>
+  </dependency>
+  ...
+</dependencies>
+```
+
+## Usage
 
 ### Instantiating a client
 
@@ -19,7 +53,7 @@ public class Main {
 }
 ```
 
-If Epic Games ever deprecate this library's default launcher and client tokens, you may provide newer ones like this:
+If Epic Games ever deprecate this library's default launcher and client tokens, you may provide your own like this:
 
 ```java
 import io.github.robertograham.fortnite2.client.Fortnite;
@@ -56,7 +90,7 @@ public class Main {
 }
 ```
 
-### Getting an account using its display name
+### Fetching an account using its username
 
 ```java
 import io.github.robertograham.fortnite2.client.Fortnite;
@@ -85,7 +119,7 @@ public class Main {
 }
 ```
 
-### Getting multiple accounts using their account IDs
+### Fetching many accounts using their IDs
 
 ```java
 import io.github.robertograham.fortnite2.client.Fortnite;
@@ -167,7 +201,7 @@ public class Main {
 }
 ```
 
-Filtering by platform, then party type
+Filtering by platform and then party type
 
 ```java
 import io.github.robertograham.fortnite2.client.Fortnite;
@@ -202,7 +236,7 @@ public class Main {
 }
 ```
 
-Filtering by party type, then platform
+Filtering by party type and then platform
 
 ```java
 import io.github.robertograham.fortnite2.client.Fortnite;
@@ -385,7 +419,6 @@ public class Main {
                     )
                     .forEach(System.out::println);
         } catch (IOException exception) {
-            exception.printStackTrace();
             // findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason unexpected response
             // OR findAllByAccountIds unexpected response
         }
