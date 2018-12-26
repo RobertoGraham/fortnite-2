@@ -19,7 +19,7 @@ Features:
 <properties>
   ...
   <!-- Use the latest version whenever possible. -->
-  <fortnite-2.version>1.0.1</fortnite-2.version>
+  <fortnite-2.version>1.0.2</fortnite-2.version>
   ...
 </properties>
 
