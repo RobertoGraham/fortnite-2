@@ -2,6 +2,7 @@ package io.github.robertograham.fortnite2.implementation;
 
 import io.github.robertograham.fortnite2.domain.Statistic;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 abstract class ForwardingStatistic implements Statistic {
@@ -60,6 +61,11 @@ abstract class ForwardingStatistic implements Statistic {
     @Override
     public final long timesPlacedTop6() {
         return statistic.timesPlacedTop6();
+    }
+
+    @Override
+    public LocalDateTime timeLastModified() {
+        return statistic.timeLastModified();
     }
 
     @Override

@@ -2,6 +2,10 @@ package io.github.robertograham.fortnite2.implementation;
 
 import io.github.robertograham.fortnite2.domain.Statistic;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -20,10 +24,12 @@ final class DefaultStatistic implements Statistic {
     private final long timesPlacedTop12;
     private final long timesPlacedTop3;
     private final long timesPlacedTop6;
+    private final LocalDateTime timeLastModified;
 
     DefaultStatistic(Set<RawStatistic> rawStatistics) {
         final Map<String, Long> summedValuesGroupedByStatType =
                 rawStatistics.stream()
+                        .filter(rawStatistic -> !"lastmodified".equals(rawStatistic.type()))
                         .collect(
                                 Collectors.groupingBy(
                                         RawStatistic::type,
@@ -40,6 +46,16 @@ final class DefaultStatistic implements Statistic {
         timesPlacedTop12 = summedValuesGroupedByStatType.getOrDefault("placetop12", 0L);
         timesPlacedTop3 = summedValuesGroupedByStatType.getOrDefault("placetop3", 0L);
         timesPlacedTop6 = summedValuesGroupedByStatType.getOrDefault("placetop6", 0L);
+        timeLastModified = rawStatistics.stream()
+                .filter(rawStatistic -> "lastmodified".equals(rawStatistic.type()))
+                .max(Comparator.comparingLong(RawStatistic::value))
+                .map(rawStatistic ->
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochSecond(rawStatistic.value()),
+                                ZoneOffset.UTC
+                        )
+                )
+                .orElse(LocalDateTime.MIN);
     }
 
     @Override
@@ -93,6 +109,11 @@ final class DefaultStatistic implements Statistic {
     }
 
     @Override
+    public LocalDateTime timeLastModified() {
+        return timeLastModified;
+    }
+
+    @Override
     public String toString() {
         return "DefaultStatistic{" +
                 "wins=" + wins +
@@ -105,6 +126,7 @@ final class DefaultStatistic implements Statistic {
                 ", timesPlacedTop12=" + timesPlacedTop12 +
                 ", timesPlacedTop3=" + timesPlacedTop3 +
                 ", timesPlacedTop6=" + timesPlacedTop6 +
+                ", timeLastModified=" + timeLastModified +
                 '}';
     }
 
@@ -124,11 +146,12 @@ final class DefaultStatistic implements Statistic {
                 timesPlacedTop5 == defaultStatistic.timesPlacedTop5 &&
                 timesPlacedTop12 == defaultStatistic.timesPlacedTop12 &&
                 timesPlacedTop3 == defaultStatistic.timesPlacedTop3 &&
-                timesPlacedTop6 == defaultStatistic.timesPlacedTop6;
+                timesPlacedTop6 == defaultStatistic.timesPlacedTop6 &&
+                timeLastModified.equals(defaultStatistic.timeLastModified);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(wins, matches, kills, score, timesPlacedTop10, timesPlacedTop25, timesPlacedTop5, timesPlacedTop12, timesPlacedTop3, timesPlacedTop6);
+        return Objects.hash(wins, matches, kills, score, timesPlacedTop10, timesPlacedTop25, timesPlacedTop5, timesPlacedTop12, timesPlacedTop3, timesPlacedTop6, timeLastModified);
     }
 }
