@@ -4,6 +4,7 @@ import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.resource.AccountResource;
 import io.github.robertograham.fortnite2.resource.LeaderBoardResource;
 import io.github.robertograham.fortnite2.resource.StatisticResource;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -135,11 +136,7 @@ public final class DefaultFortnite implements Fortnite {
         } catch (IOException exception) {
             exception.printStackTrace();
         }
-        try {
-            httpClient.close();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
+        HttpClientUtils.closeQuietly(httpClient);
     }
 
     /**
