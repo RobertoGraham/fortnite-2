@@ -5,7 +5,7 @@
 
     <groupId>io.github.robertograham</groupId>
     <artifactId>fortnite-2</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -31,7 +31,7 @@
         <url>https://github.com/RobertoGraham/fortnite-2</url>
         <connection>scm:git:git://github.com/RobertoGraham/fortnite-2.git</connection>
         <developerConnection>scm:git:git@github.com:RobertoGraham/fortnite-2.git</developerConnection>
-        <tag>fortnite-2-1.1.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
