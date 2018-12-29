@@ -1,5 +1,8 @@
 package io.github.robertograham.fortnite2.domain.enumeration;
 
+/**
+ * Platform a game of Fortnite can take place on
+ */
 public enum Platform {
 
     PC("pc"), PS4("ps4"), XB1("xb1");

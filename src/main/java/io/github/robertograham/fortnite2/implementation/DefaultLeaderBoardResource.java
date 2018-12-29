@@ -12,11 +12,9 @@ import org.apache.http.message.BasicNameValuePair;
 
 import javax.json.Json;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -95,6 +93,14 @@ final class DefaultLeaderBoardResource implements LeaderBoardResource {
                         .build(),
                 optionalResponseHandlerProvider.forClass(RawLeaderBoard.class)
         )
-                .map(RawLeaderBoard::leaderBoardEntries);
+                .map(RawLeaderBoard::leaderBoardEntries)
+                .map(leaderBoardEntries ->
+                        leaderBoardEntries.stream()
+                                .sorted(
+                                        Comparator.comparingLong(LeaderBoardEntry::value)
+                                                .reversed()
+                                )
+                                .collect(Collectors.toList())
+                );
     }
 }

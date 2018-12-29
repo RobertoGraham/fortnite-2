@@ -12,6 +12,9 @@ import java.util.Objects;
 
 import static java.time.LocalDateTime.now;
 
+/**
+ * Default implementation of {@link Fortnite} created using {@link Builder}
+ */
 public final class DefaultFortnite implements Fortnite {
 
     private final String epicGamesEmailAddress;
@@ -139,6 +142,10 @@ public final class DefaultFortnite implements Fortnite {
         }
     }
 
+    /**
+     * Used to create {@link Fortnite} instances
+     * Instantiated using {@link #newInstance(String, String)}
+     */
     public static final class Builder {
 
         private final String epicGamesEmailAddress;
@@ -151,22 +158,43 @@ public final class DefaultFortnite implements Fortnite {
             this.epicGamesPassword = epicGamesPassword;
         }
 
+        /**
+         * @param epicGamesEmailAddress email address used to log in
+         * @param epicGamesPassword     password used to log in
+         * @return a new {@link Builder} instance
+         * @throws NullPointerException if {@code epicGamesEmailAddress} is {@code null}
+         * @throws NullPointerException if {@code epicGamesPassword} is {@code null}
+         */
         public static Builder newInstance(String epicGamesEmailAddress, String epicGamesPassword) {
             Objects.requireNonNull(epicGamesEmailAddress, "epicGamesEmailAddress cannot be null");
             Objects.requireNonNull(epicGamesPassword, "epicGamesPassword cannot be null");
             return new Builder(epicGamesEmailAddress, epicGamesPassword);
         }
 
+        /**
+         * @param epicGamesLauncherToken token used by Epic Games Launcher
+         * @return the {@link Builder} instance this was called on
+         * @throws NullPointerException if {@code epicGamesLauncherToken} is {@code null}
+         */
         public Builder setEpicGamesLauncherToken(String epicGamesLauncherToken) {
             this.epicGamesLauncherToken = Objects.requireNonNull(epicGamesLauncherToken, "epicGamesLauncherToken cannot be null");
             return this;
         }
 
+        /**
+         * @param fortniteClientToken token used by the Fortnite client
+         * @return the {@link Builder} instance this was called on
+         * @throws NullPointerException if {@code fortniteClientToken} is {@code null}
+         */
         public Builder setFortniteClientToken(String fortniteClientToken) {
             this.fortniteClientToken = Objects.requireNonNull(fortniteClientToken, "fortniteClientToken cannot be null");
             return this;
         }
 
+        /**
+         * @return a new instance of {@link Fortnite}
+         * @throws IllegalStateException if there's a problem logging in
+         */
         public Fortnite build() {
             try {
                 return new DefaultFortnite(this);

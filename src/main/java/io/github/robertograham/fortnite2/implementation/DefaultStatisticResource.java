@@ -1,6 +1,5 @@
 package io.github.robertograham.fortnite2.implementation;
 
-import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.domain.FilterableStatistic;
 import io.github.robertograham.fortnite2.resource.StatisticResource;
 import org.apache.http.client.methods.RequestBuilder;
@@ -62,20 +61,8 @@ final class DefaultStatisticResource implements StatisticResource {
     }
 
     @Override
-    public Optional<FilterableStatistic> findAllByAccountForAllTime(Account account) throws IOException {
-        Objects.requireNonNull(account, "account cannot be null");
-        return findAllByAccountIdForAllTime(account.accountId());
-    }
-
-    @Override
     public Optional<FilterableStatistic> findAllByAccountIdForCurrentSeason(String accountId) throws IOException {
         Objects.requireNonNull(accountId, "accountId cannot be null");
         return findAllByAccountIdForWindow(accountId, "weekly");
-    }
-
-    @Override
-    public Optional<FilterableStatistic> findAllByAccountForCurrentSeason(Account account) throws IOException {
-        Objects.requireNonNull(account, "account cannot be null");
-        return findAllByAccountIdForCurrentSeason(account.accountId());
     }
 }
