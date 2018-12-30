@@ -219,12 +219,20 @@ public class Main {
             FilterableStatistic fromAccountIdCurrentSeason = fortnite.statistic()
                     .findAllByAccountIdForCurrentSeason(accountId)
                     .orElse(null);
+            FilterableStatistic fromSessionAccountIdAllTime = fortnite.statistic()
+                    .findAllBySessionAccountIdForAllTime()
+                    .orElse(null);
+            FilterableStatistic fromSessionAccountIdCurrentSeason = fortnite.statistic()
+                    .findAllBySessionAccountIdForCurrentSeason()
+                    .orElse(null);
         } catch (IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
             // OR findAllByAccountIdForAllTime unexpected response
             // OR findAllByAccountForCurrentSeason unexpected response
             // OR findAllByAccountIdForCurrentSeason unexpected response
+            // OR findAllBySessionAccountIdForAllTime unexpected response
+            // OR findAllBySessionAccountIdForCurrentSeason unexpected response
         }
     }
 }

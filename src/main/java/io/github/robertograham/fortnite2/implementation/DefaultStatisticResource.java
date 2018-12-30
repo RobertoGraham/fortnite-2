@@ -19,22 +19,27 @@ final class DefaultStatisticResource implements StatisticResource {
     private final CloseableHttpClient httpClient;
     private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
     private final Supplier<String> accessTokenSupplier;
+    private final Supplier<String> sessionAccountIdSupplier;
 
     private DefaultStatisticResource(CloseableHttpClient httpClient,
                                      OptionalResponseHandlerProvider optionalResponseHandlerProvider,
-                                     Supplier<String> accessTokenSupplier) {
+                                     Supplier<String> accessTokenSupplier,
+                                     Supplier<String> sessionAccountIdSupplier) {
         this.httpClient = httpClient;
         this.optionalResponseHandlerProvider = optionalResponseHandlerProvider;
         this.accessTokenSupplier = accessTokenSupplier;
+        this.sessionAccountIdSupplier = sessionAccountIdSupplier;
     }
 
     static DefaultStatisticResource newInstance(CloseableHttpClient httpClient,
                                                 OptionalResponseHandlerProvider optionalResponseHandlerProvider,
-                                                Supplier<String> sessionTokenSupplier) {
+                                                Supplier<String> sessionTokenSupplier,
+                                                Supplier<String> sessionAccountIdSupplier) {
         return new DefaultStatisticResource(
                 httpClient,
                 optionalResponseHandlerProvider,
-                sessionTokenSupplier
+                sessionTokenSupplier,
+                sessionAccountIdSupplier
         );
     }
 
@@ -61,8 +66,18 @@ final class DefaultStatisticResource implements StatisticResource {
     }
 
     @Override
+    public Optional<FilterableStatistic> findAllBySessionAccountIdForAllTime() throws IOException {
+        return findAllByAccountIdForAllTime(sessionAccountIdSupplier.get());
+    }
+
+    @Override
     public Optional<FilterableStatistic> findAllByAccountIdForCurrentSeason(String accountId) throws IOException {
         Objects.requireNonNull(accountId, "accountId cannot be null");
         return findAllByAccountIdForWindow(accountId, "weekly");
+    }
+
+    @Override
+    public Optional<FilterableStatistic> findAllBySessionAccountIdForCurrentSeason() throws IOException {
+        return findAllByAccountIdForCurrentSeason(sessionAccountIdSupplier.get());
     }
 }

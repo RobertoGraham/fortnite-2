@@ -55,7 +55,8 @@ public final class DefaultFortnite implements Fortnite {
         statisticResource = DefaultStatisticResource.newInstance(
                 httpClient,
                 JsonOptionalResponseHandlerProvider.INSTANCE,
-                () -> nonExpiredSessionToken().accessToken()
+                () -> nonExpiredSessionToken().accessToken(),
+                () -> nonExpiredSessionToken().accountId()
         );
     }
 

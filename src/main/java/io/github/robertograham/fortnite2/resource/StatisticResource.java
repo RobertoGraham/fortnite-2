@@ -43,6 +43,18 @@ public interface StatisticResource {
     }
 
     /**
+     * @return an {@link Optional} of {@link FilterableStatistic} that's non-empty
+     * is the API response isn't empty
+     * @throws IOException if there's an unexpected HTTP status code (less than
+     *                     200 or greater than 299) or if there's a problem reading the
+     *                     API response
+     * @since 1.2.0
+     */
+    default Optional<FilterableStatistic> findAllBySessionAccountIdForAllTime() throws IOException {
+        return Optional.empty();
+    }
+
+    /**
      * @param accountId ID of the Epic Games account to fetch current season
      *                  statistics for
      * @return an {@link Optional} of {@link FilterableStatistic} that's non-empty
@@ -68,5 +80,17 @@ public interface StatisticResource {
     default Optional<FilterableStatistic> findAllByAccountForCurrentSeason(Account account) throws IOException {
         Objects.requireNonNull(account, "account cannot be null");
         return findAllByAccountIdForCurrentSeason(account.accountId());
+    }
+
+    /**
+     * @return an {@link Optional} of {@link FilterableStatistic} that's non-empty
+     * is the API response isn't empty
+     * @throws IOException if there's an unexpected HTTP status code (less than
+     *                     200 or greater than 299) or if there's a problem reading the
+     *                     API response
+     * @since 1.2.0
+     */
+    default Optional<FilterableStatistic> findAllBySessionAccountIdForCurrentSeason() throws IOException {
+        return Optional.empty();
     }
 }
