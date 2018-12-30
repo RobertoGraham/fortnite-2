@@ -14,17 +14,20 @@ final class Token {
     private final String refreshToken;
     private final LocalDateTime refreshExpiresAt;
     private final String inAppId;
+    private final String accountId;
 
     private Token(String accessToken,
                   LocalDateTime expiresAt,
                   String refreshToken,
                   LocalDateTime refreshExpiresAt,
-                  String inAppId) {
+                  String inAppId,
+                  String accountId) {
         this.accessToken = accessToken;
         this.expiresAt = expiresAt;
         this.refreshToken = refreshToken;
         this.refreshExpiresAt = refreshExpiresAt;
         this.inAppId = inAppId;
+        this.accountId = accountId;
     }
 
     String accessToken() {
@@ -47,6 +50,10 @@ final class Token {
         return inAppId;
     }
 
+    String accountId() {
+        return accountId;
+    }
+
     @Override
     public String toString() {
         return "Token{" +
@@ -55,6 +62,7 @@ final class Token {
                 ", refreshToken='" + refreshToken + '\'' +
                 ", refreshExpiresAt=" + refreshExpiresAt +
                 ", inAppId='" + inAppId + '\'' +
+                ", accountId='" + accountId + '\'' +
                 '}';
     }
 
@@ -69,12 +77,13 @@ final class Token {
                 expiresAt.equals(token.expiresAt) &&
                 refreshToken.equals(token.refreshToken) &&
                 refreshExpiresAt.equals(token.refreshExpiresAt) &&
-                inAppId.equals(token.inAppId);
+                inAppId.equals(token.inAppId) &&
+                accountId.equals(token.accountId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accessToken, expiresAt, refreshToken, refreshExpiresAt, inAppId);
+        return Objects.hash(accessToken, expiresAt, refreshToken, refreshExpiresAt, inAppId, accountId);
     }
 
     enum Adapter implements JsonbAdapter<Token, JsonObject> {
@@ -99,7 +108,8 @@ final class Token {
                             Instant.parse(jsonObject.getString("refresh_expires_at")),
                             ZoneOffset.UTC
                     ),
-                    jsonObject.getString("in_app_id")
+                    jsonObject.getString("in_app_id"),
+                    jsonObject.getString("account_id")
             );
         }
     }

@@ -21,22 +21,28 @@ final class DefaultAccountResource implements AccountResource {
     private final CloseableHttpClient httpClient;
     private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
     private final Supplier<String> accessTokenSupplier;
+    private final Supplier<String> sessionAccountIdSupplier;
 
     private DefaultAccountResource(CloseableHttpClient httpClient,
                                    OptionalResponseHandlerProvider optionalResponseHandlerProvider,
-                                   Supplier<String> accessTokenSupplier) {
+                                   Supplier<String> accessTokenSupplier,
+                                   Supplier<String> sessionAccountIdSupplier) {
         this.httpClient = httpClient;
         this.optionalResponseHandlerProvider = optionalResponseHandlerProvider;
         this.accessTokenSupplier = accessTokenSupplier;
+        this.sessionAccountIdSupplier = sessionAccountIdSupplier;
     }
 
     static DefaultAccountResource newInstance(CloseableHttpClient httpClient,
                                               OptionalResponseHandlerProvider optionalResponseHandlerProvider,
-                                              Supplier<String> sessionTokenSupplier) {
+                                              Supplier<String> sessionTokenSupplier,
+                                              Supplier<String> sessionAccountIdSupplier) {
         return new DefaultAccountResource(
                 httpClient,
                 optionalResponseHandlerProvider,
-                sessionTokenSupplier);
+                sessionTokenSupplier,
+                sessionAccountIdSupplier
+        );
     }
 
     @Override
@@ -50,6 +56,15 @@ final class DefaultAccountResource implements AccountResource {
                 optionalResponseHandlerProvider.forClass(DefaultAccount.class)
         )
                 .map(Function.identity());
+    }
+
+    @Override
+    public Optional<Account> findOneBySessionAccountId() throws IOException {
+        return findAllByAccountIds(sessionAccountIdSupplier.get())
+                .flatMap(accounts ->
+                        accounts.stream()
+                                .findFirst()
+                );
     }
 
     @Override

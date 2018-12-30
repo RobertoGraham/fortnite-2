@@ -4,13 +4,12 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
@@ -27,18 +26,31 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DefaultAccountResourceTest {
 
-    @Mock
     private CloseableHttpClient mockHttpClient;
-    @Mock
     private OptionalResponseHandlerProvider mockOptionalResponseHandlerProvider;
-    @Mock
     private Supplier<String> mockAccessTokenSupplier;
-    @InjectMocks
+    private Supplier<String> mockSessionAccountIdSupplier;
     private DefaultAccountResource accountResource;
     @Captor
     private ArgumentCaptor<HttpUriRequest> requestArgumentCaptor;
     @Captor
     private ArgumentCaptor<ResponseHandler<Optional<DefaultAccount>>> defaultAccountOptionalResponseHandlerArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<ResponseHandler<Optional<DefaultAccount[]>>> defaultAccountOptionalArrayResponseHandlerArgumentCaptor;
+
+    @BeforeEach
+    void setUpMocks() {
+        mockHttpClient = mock(CloseableHttpClient.class);
+        mockOptionalResponseHandlerProvider = mock(OptionalResponseHandlerProvider.class);
+        mockAccessTokenSupplier = mock(StringSupplier.class);
+        mockSessionAccountIdSupplier = mock(StringSupplier.class);
+        accountResource = DefaultAccountResource.newInstance(
+                mockHttpClient,
+                mockOptionalResponseHandlerProvider,
+                mockAccessTokenSupplier,
+                mockSessionAccountIdSupplier
+        );
+    }
 
     @Test
     @DisplayName("findOneByDisplayName throws NPE")
@@ -75,5 +87,37 @@ class DefaultAccountResourceTest {
                         AUTHORIZATION.equals(header.getName())
                                 && "bearer accessToken".equals(header.getValue())
                 ));
+    }
+
+    @Test
+    @DisplayName("findOneBySessionAccountId executes correct request")
+    void findOneBySessionAccountIdUsesCorrectRequest() throws IOException {
+        ResponseHandler<Optional<DefaultAccount[]>> responseHandler = response -> Optional.empty();
+        when(mockOptionalResponseHandlerProvider.forClass(DefaultAccount[].class))
+                .thenReturn(responseHandler);
+        when(mockHttpClient.execute(any(HttpUriRequest.class), any(ResponseHandler.class)))
+                .thenReturn(responseHandler.handleResponse(null));
+        when(mockAccessTokenSupplier.get())
+                .thenReturn("accessToken");
+        when(mockSessionAccountIdSupplier.get())
+                .thenReturn("accountId");
+        accountResource.findOneBySessionAccountId();
+        verify(mockHttpClient, times(1))
+                .execute(requestArgumentCaptor.capture(), defaultAccountOptionalArrayResponseHandlerArgumentCaptor.capture());
+        assertEquals(responseHandler, defaultAccountOptionalArrayResponseHandlerArgumentCaptor.getValue());
+        HttpUriRequest actualRequest = requestArgumentCaptor.getValue();
+        assertEquals(HttpGet.METHOD_NAME, actualRequest.getMethod());
+        assertEquals(
+                URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account?accountId=accountId"),
+                actualRequest.getURI()
+        );
+        assertTrue(Arrays.stream(actualRequest.getAllHeaders())
+                .anyMatch(header ->
+                        AUTHORIZATION.equals(header.getName())
+                                && "bearer accessToken".equals(header.getValue())
+                ));
+    }
+
+    private interface StringSupplier extends Supplier<String> {
     }
 }

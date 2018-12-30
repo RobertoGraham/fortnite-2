@@ -119,6 +119,35 @@ public class Main {
 }
 ```
 
+### Fetching an account using the session's account ID
+
+```java
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+import java.util.Optional;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (Fortnite fortnite = builder.build()) {
+            Optional<Account> account = fortnite.account()
+                    .findOneBySessionAccountId();
+            // nothing printed if the response was empty
+            account.map(Account::accountId)
+                    .ifPresent(System.out::println);
+            account.map(Account::displayName)
+                    .ifPresent(System.out::println);
+        } catch (IOException exception) {
+            // findOneBySessionAccountId unexpected response
+        }
+    }
+}
+```
+
 ### Fetching many accounts using their IDs
 
 ```java

@@ -43,7 +43,8 @@ public final class DefaultFortnite implements Fortnite {
         accountResource = DefaultAccountResource.newInstance(
                 httpClient,
                 JsonOptionalResponseHandlerProvider.INSTANCE,
-                () -> nonExpiredSessionToken().accessToken()
+                () -> nonExpiredSessionToken().accessToken(),
+                () -> nonExpiredSessionToken().accountId()
         );
         leaderBoardResource = DefaultLeaderBoardResource.newInstance(
                 httpClient,

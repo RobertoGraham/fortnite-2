@@ -26,6 +26,18 @@ public interface AccountResource {
     Optional<Account> findOneByDisplayName(String displayName) throws IOException;
 
     /**
+     * @return an {@link Optional} of {@link Account} that's non-empty if an
+     * account matching the current session's account ID was found
+     * @throws IOException if there's an unexpected HTTP status code (less than
+     *                     200 or greater than 299) or if there's a problem reading the
+     *                     API response
+     * @since 1.2.0
+     */
+    default Optional<Account> findOneBySessionAccountId() throws IOException {
+        return Optional.empty();
+    }
+
+    /**
      * @param accountIds IDs of the Epic Games accounts to be retrieved
      * @return an {@link Optional} of {@link Set} of {@link Account} that's
      * non-empty if any accounts matching the supplied IDs were found
