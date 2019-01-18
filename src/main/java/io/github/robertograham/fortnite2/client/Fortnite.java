@@ -36,7 +36,7 @@ public interface Fortnite extends AutoCloseable {
 
     /**
      * @return an object from which friend related API endpoints can be called
-     * @since 1.2.0
+     * @since 1.3.0
      */
     default FriendResource friend() {
         return null;

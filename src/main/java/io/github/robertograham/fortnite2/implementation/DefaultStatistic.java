@@ -31,9 +31,9 @@ final class DefaultStatistic implements Statistic {
             rawStatistics.stream()
                 .filter(rawStatistic -> !"lastmodified".equals(rawStatistic.type()))
                 .collect(Collectors.groupingBy(
-                        RawStatistic::type,
-                        Collectors.summingLong(RawStatistic::value)
-                    ));
+                    RawStatistic::type,
+                    Collectors.summingLong(RawStatistic::value)
+                ));
         wins = summedValuesGroupedByStatType.getOrDefault("placetop1", 0L);
         matches = summedValuesGroupedByStatType.getOrDefault("matchesplayed", 0L);
         kills = summedValuesGroupedByStatType.getOrDefault("kills", 0L);
