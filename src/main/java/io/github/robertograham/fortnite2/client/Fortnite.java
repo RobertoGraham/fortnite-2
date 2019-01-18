@@ -1,6 +1,7 @@
 package io.github.robertograham.fortnite2.client;
 
 import io.github.robertograham.fortnite2.resource.AccountResource;
+import io.github.robertograham.fortnite2.resource.FriendResource;
 import io.github.robertograham.fortnite2.resource.LeaderBoardResource;
 import io.github.robertograham.fortnite2.resource.StatisticResource;
 
@@ -32,4 +33,12 @@ public interface Fortnite extends AutoCloseable {
      * @since 1.0.0
      */
     StatisticResource statistic();
+
+    /**
+     * @return an object from which friend related API endpoints can be called
+     * @since 1.2.0
+     */
+    default FriendResource friend() {
+        return null;
+    }
 }
