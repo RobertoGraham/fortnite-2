@@ -21,77 +21,79 @@ final class AuthenticationResource {
     private final CloseableHttpClient httpClient;
     private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
 
-    private AuthenticationResource(CloseableHttpClient httpClient,
-                                   OptionalResponseHandlerProvider optionalResponseHandlerProvider) {
+    private AuthenticationResource(final CloseableHttpClient httpClient,
+                                   final OptionalResponseHandlerProvider optionalResponseHandlerProvider) {
         this.httpClient = httpClient;
         this.optionalResponseHandlerProvider = optionalResponseHandlerProvider;
     }
 
-    static AuthenticationResource newInstance(CloseableHttpClient httpClient,
-                                              OptionalResponseHandlerProvider optionalResponseHandlerProvider) {
+    static AuthenticationResource newInstance(final CloseableHttpClient httpClient,
+                                              final OptionalResponseHandlerProvider optionalResponseHandlerProvider) {
         return new AuthenticationResource(
-                httpClient,
-                optionalResponseHandlerProvider
+            httpClient,
+            optionalResponseHandlerProvider
         );
     }
 
-    private Optional<Token> postForToken(String bearerToken,
-                                         NameValuePair... formParameters) throws IOException {
+    private Optional<Token> postForToken(final String bearerToken,
+                                         final NameValuePair... formParameters) throws IOException {
         return httpClient.execute(
-                RequestBuilder.post("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/token")
-                        .setHeader(AUTHORIZATION, "basic " + bearerToken)
-                        .setEntity(
-                                EntityBuilder.create()
-                                        .setContentType(APPLICATION_FORM_URLENCODED)
-                                        .setParameters(formParameters)
-                                        .build()
-                        )
-                        .build(),
-                optionalResponseHandlerProvider.forClass(Token.class)
+            RequestBuilder.post("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/token")
+                .setHeader(AUTHORIZATION, "basic " + bearerToken)
+                .setEntity(EntityBuilder.create()
+                    .setContentType(APPLICATION_FORM_URLENCODED)
+                    .setParameters(formParameters)
+                    .build())
+                .build(),
+            optionalResponseHandlerProvider.forClass(Token.class)
         );
     }
 
-    Optional<Token> passwordGrantedToken(String epicGamesEmailAddress, String epicGamesPassword, String epicGamesLauncherToken) throws IOException {
+    Optional<Token> passwordGrantedToken(final String epicGamesEmailAddress,
+                                         final String epicGamesPassword,
+                                         final String epicGamesLauncherToken) throws IOException {
         return postForToken(
-                epicGamesLauncherToken,
-                GRANT_TYPE_PASSWORD_PARAMETER,
-                new BasicNameValuePair("username", epicGamesEmailAddress),
-                new BasicNameValuePair("password", epicGamesPassword)
+            epicGamesLauncherToken,
+            GRANT_TYPE_PASSWORD_PARAMETER,
+            new BasicNameValuePair("username", epicGamesEmailAddress),
+            new BasicNameValuePair("password", epicGamesPassword)
         );
     }
 
-    Optional<Exchange> accessTokenGrantedExchange(String accessToken) throws IOException {
+    Optional<Exchange> accessTokenGrantedExchange(final String accessToken) throws IOException {
         return httpClient.execute(
-                RequestBuilder.get("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/exchange")
-                        .setHeader(AUTHORIZATION, "bearer " + accessToken)
-                        .build(),
-                optionalResponseHandlerProvider.forClass(Exchange.class)
+            RequestBuilder.get("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/exchange")
+                .setHeader(AUTHORIZATION, "bearer " + accessToken)
+                .build(),
+            optionalResponseHandlerProvider.forClass(Exchange.class)
         );
     }
 
-    Optional<Token> exchangeCodeGrantedToken(String exchangeCode, String fortniteClientToken) throws IOException {
+    Optional<Token> exchangeCodeGrantedToken(final String exchangeCode,
+                                             final String fortniteClientToken) throws IOException {
         return postForToken(
-                fortniteClientToken,
-                GRANT_TYPE_EXCHANGE_CODE_PARAMETER,
-                TOKEN_TYPE_EG1,
-                new BasicNameValuePair("exchange_code", exchangeCode)
+            fortniteClientToken,
+            GRANT_TYPE_EXCHANGE_CODE_PARAMETER,
+            TOKEN_TYPE_EG1,
+            new BasicNameValuePair("exchange_code", exchangeCode)
         );
     }
 
-    Optional<Token> refreshTokenGrantedToken(String refreshToken, String fortniteClientToken) throws IOException {
+    Optional<Token> refreshTokenGrantedToken(final String refreshToken,
+                                             final String fortniteClientToken) throws IOException {
         return postForToken(
-                fortniteClientToken,
-                GRANT_TYPE_REFRESH_TOKEN_PARAMETER,
-                new BasicNameValuePair("refresh_token", refreshToken)
+            fortniteClientToken,
+            GRANT_TYPE_REFRESH_TOKEN_PARAMETER,
+            new BasicNameValuePair("refresh_token", refreshToken)
         );
     }
 
-    void retireAccessToken(String accessToken) throws IOException {
+    void retireAccessToken(final String accessToken) throws IOException {
         httpClient.execute(
-                RequestBuilder.delete("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/sessions/kill/" + accessToken)
-                        .setHeader(AUTHORIZATION, "bearer " + accessToken)
-                        .build(),
-                optionalResponseHandlerProvider.forString()
+            RequestBuilder.delete("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/sessions/kill/" + accessToken)
+                .setHeader(AUTHORIZATION, "bearer " + accessToken)
+                .build(),
+            optionalResponseHandlerProvider.forString()
         );
     }
 }

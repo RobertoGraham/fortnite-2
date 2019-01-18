@@ -23,7 +23,7 @@ public interface AccountResource {
      * @throws NullPointerException if {@code displayName} is {@code null}
      * @since 1.0.0
      */
-    Optional<Account> findOneByDisplayName(String displayName) throws IOException;
+    Optional<Account> findOneByDisplayName(final String displayName) throws IOException;
 
     /**
      * @return an {@link Optional} of {@link Account} that's non-empty if an
@@ -48,5 +48,5 @@ public interface AccountResource {
      * @throws NullPointerException if any of the supplied IDs are {@code null}
      * @since 1.0.0
      */
-    Optional<Set<Account>> findAllByAccountIds(String... accountIds) throws IOException;
+    Optional<Set<Account>> findAllByAccountIds(final String... accountIds) throws IOException;
 }

@@ -12,35 +12,36 @@ abstract class StatisticFilterer extends ForwardingStatistic {
 
     private final Set<RawStatistic> rawStatistics;
 
-    StatisticFilterer(Set<RawStatistic> rawStatistics) {
+    StatisticFilterer(final Set<RawStatistic> rawStatistics) {
         super(new DefaultStatistic(rawStatistics));
         this.rawStatistics = rawStatistics;
     }
 
-    final <T extends Statistic> T newFilteredStatistic(Predicate<RawStatistic> rawStatisticPredicate, Function<Set<RawStatistic>, T> statisticFactory) {
+    final <T extends Statistic> T newFilteredStatistic(final Predicate<RawStatistic> rawStatisticPredicate,
+                                                       final Function<Set<RawStatistic>, T> statisticFactory) {
         return statisticFactory.apply(
-                rawStatistics.stream()
-                        .filter(rawStatisticPredicate)
-                        .collect(Collectors.toSet())
+            rawStatistics.stream()
+                .filter(rawStatisticPredicate)
+                .collect(Collectors.toSet())
         );
     }
 
     @Override
     public String toString() {
         return "StatisticFilterer{" +
-                "rawStatistics=" + rawStatistics +
-                "} " + super.toString();
+            "rawStatistics=" + rawStatistics +
+            "} " + super.toString();
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof StatisticFilterer))
             return false;
         if (!super.equals(object))
             return false;
-        StatisticFilterer statisticFilterer = (StatisticFilterer) object;
+        final StatisticFilterer statisticFilterer = (StatisticFilterer) object;
         return rawStatistics.equals(statisticFilterer.rawStatistics);
     }
 

@@ -10,7 +10,7 @@ final class Cohort {
 
     private final List<String> cohortAccounts;
 
-    private Cohort(List<String> cohortAccounts) {
+    private Cohort(final List<String> cohortAccounts) {
         this.cohortAccounts = cohortAccounts;
     }
 
@@ -21,17 +21,17 @@ final class Cohort {
     @Override
     public String toString() {
         return "Cohort{" +
-                "cohortAccounts=" + cohortAccounts +
-                '}';
+            "cohortAccounts=" + cohortAccounts +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof Cohort))
             return false;
-        Cohort cohort = (Cohort) object;
+        final Cohort cohort = (Cohort) object;
         return cohortAccounts.equals(cohort.cohortAccounts);
     }
 
@@ -45,16 +45,14 @@ final class Cohort {
         INSTANCE;
 
         @Override
-        public JsonObject adaptToJson(Cohort cohort) {
+        public JsonObject adaptToJson(final Cohort cohort) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Cohort adaptFromJson(JsonObject jsonObject) {
-            return new Cohort(
-                    jsonObject.getJsonArray("cohortAccounts")
-                            .getValuesAs(JsonString::getString)
-            );
+        public Cohort adaptFromJson(final JsonObject jsonObject) {
+            return new Cohort(jsonObject.getJsonArray("cohortAccounts")
+                .getValuesAs(JsonString::getString));
         }
     }
 }

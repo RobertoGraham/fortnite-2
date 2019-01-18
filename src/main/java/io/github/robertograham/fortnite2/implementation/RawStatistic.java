@@ -11,10 +11,10 @@ final class RawStatistic {
     private final String partyType;
     private final long value;
 
-    private RawStatistic(String type,
-                         String platform,
-                         String partyType,
-                         long value) {
+    private RawStatistic(final String type,
+                         final String platform,
+                         final String partyType,
+                         final long value) {
         this.type = type;
         this.platform = platform;
         this.partyType = partyType;
@@ -40,24 +40,24 @@ final class RawStatistic {
     @Override
     public String toString() {
         return "RawStatistic{" +
-                "type='" + type + '\'' +
-                ", platform='" + platform + '\'' +
-                ", partyType='" + partyType + '\'' +
-                ", value=" + value +
-                '}';
+            "type='" + type + '\'' +
+            ", platform='" + platform + '\'' +
+            ", partyType='" + partyType + '\'' +
+            ", value=" + value +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof RawStatistic))
             return false;
-        RawStatistic rawStatistic = (RawStatistic) object;
+        final RawStatistic rawStatistic = (RawStatistic) object;
         return value == rawStatistic.value &&
-                type.equals(rawStatistic.type) &&
-                platform.equals(rawStatistic.platform) &&
-                partyType.equals(rawStatistic.partyType);
+            type.equals(rawStatistic.type) &&
+            platform.equals(rawStatistic.platform) &&
+            partyType.equals(rawStatistic.partyType);
     }
 
     @Override
@@ -70,20 +70,19 @@ final class RawStatistic {
         INSTANCE;
 
         @Override
-        public JsonObject adaptToJson(RawStatistic rawStatistic) {
+        public JsonObject adaptToJson(final RawStatistic rawStatistic) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public RawStatistic adaptFromJson(JsonObject jsonObject) {
-            final String[] nameParts =
-                    jsonObject.getString("name")
-                            .split("_");
+        public RawStatistic adaptFromJson(final JsonObject jsonObject) {
+            final String[] nameParts = jsonObject.getString("name")
+                .split("_");
             return new RawStatistic(
-                    nameParts[1],
-                    nameParts[2],
-                    nameParts[4],
-                    jsonObject.getJsonNumber("value").longValueExact()
+                nameParts[1],
+                nameParts[2],
+                nameParts[4],
+                jsonObject.getJsonNumber("value").longValueExact()
             );
         }
     }

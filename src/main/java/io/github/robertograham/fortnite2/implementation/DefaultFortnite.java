@@ -29,88 +29,88 @@ public final class DefaultFortnite implements Fortnite {
     private final StatisticResource statisticResource;
     private Token sessionToken;
 
-    private DefaultFortnite(Builder builder) throws IOException {
+    private DefaultFortnite(final Builder builder) throws IOException {
         epicGamesEmailAddress = builder.epicGamesEmailAddress;
         epicGamesPassword = builder.epicGamesPassword;
         epicGamesLauncherToken = builder.epicGamesLauncherToken;
         fortniteClientToken = builder.fortniteClientToken;
         httpClient = HttpClients.createDefault();
         authenticationResource = AuthenticationResource.newInstance(
-                httpClient,
-                JsonOptionalResponseHandlerProvider.INSTANCE
+            httpClient,
+            JsonOptionalResponseHandlerProvider.INSTANCE
         );
         sessionToken = fetchSessionToken();
         accountResource = DefaultAccountResource.newInstance(
-                httpClient,
-                JsonOptionalResponseHandlerProvider.INSTANCE,
-                () -> nonExpiredSessionToken().accessToken(),
-                () -> nonExpiredSessionToken().accountId()
+            httpClient,
+            JsonOptionalResponseHandlerProvider.INSTANCE,
+            () -> nonExpiredSessionToken().accessToken(),
+            () -> nonExpiredSessionToken().accountId()
         );
         leaderBoardResource = DefaultLeaderBoardResource.newInstance(
-                httpClient,
-                JsonOptionalResponseHandlerProvider.INSTANCE,
-                () -> nonExpiredSessionToken().accessToken(),
-                () -> nonExpiredSessionToken().inAppId()
+            httpClient,
+            JsonOptionalResponseHandlerProvider.INSTANCE,
+            () -> nonExpiredSessionToken().accessToken(),
+            () -> nonExpiredSessionToken().inAppId()
         );
         statisticResource = DefaultStatisticResource.newInstance(
-                httpClient,
-                JsonOptionalResponseHandlerProvider.INSTANCE,
-                () -> nonExpiredSessionToken().accessToken(),
-                () -> nonExpiredSessionToken().accountId()
+            httpClient,
+            JsonOptionalResponseHandlerProvider.INSTANCE,
+            () -> nonExpiredSessionToken().accessToken(),
+            () -> nonExpiredSessionToken().accountId()
         );
     }
 
     private Token fetchSessionToken() throws IOException {
         final String accessToken = authenticationResource.passwordGrantedToken(
-                epicGamesEmailAddress,
-                epicGamesPassword,
-                epicGamesLauncherToken
+            epicGamesEmailAddress,
+            epicGamesPassword,
+            epicGamesLauncherToken
         )
-                .map(Token::accessToken)
-                .orElseThrow(() -> new IOException("Couldn't retrieve an access token"));
+            .map(Token::accessToken)
+            .orElseThrow(() -> new IOException("Couldn't retrieve an access token"));
         final String exchangeCode = authenticationResource.accessTokenGrantedExchange(accessToken)
-                .map(Exchange::code)
-                .orElseThrow(() -> new IOException("Couldn't retrieve an exchange code"));
+            .map(Exchange::code)
+            .orElseThrow(() -> new IOException("Couldn't retrieve an exchange code"));
         return authenticationResource.exchangeCodeGrantedToken(
-                exchangeCode,
-                fortniteClientToken
+            exchangeCode,
+            fortniteClientToken
         )
-                .orElseThrow(() -> new IOException("Couldn't establish a session"));
+            .orElseThrow(() -> new IOException("Couldn't establish a session"));
     }
 
     private Token nonExpiredSessionToken() {
         if (sessionToken.refreshExpiresAt()
-                .minusMinutes(5L)
-                .isBefore(now())) {
+            .minusMinutes(5L)
+            .isBefore(now())) {
             establishNewSession();
         }
         if (sessionToken.expiresAt()
-                .minusMinutes(5L)
-                .isBefore(now()))
+            .minusMinutes(5L)
+            .isBefore(now()))
             refreshSession();
         return sessionToken;
     }
 
     private void establishNewSession() {
         try {
-            String oldAccessToken = sessionToken.accessToken();
+            final String oldAccessToken = sessionToken.accessToken();
             sessionToken = fetchSessionToken();
             authenticationResource.retireAccessToken(oldAccessToken);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             exception.printStackTrace();
         }
     }
 
     private void refreshSession() {
         try {
-            String oldAccessToken = sessionToken.accessToken();
+            final String oldAccessToken = sessionToken.accessToken();
             sessionToken = authenticationResource.refreshTokenGrantedToken(
-                    sessionToken.refreshToken(),
-                    fortniteClientToken
+                sessionToken.refreshToken(),
+                fortniteClientToken
             )
-                    .orElseThrow(() -> new IOException("Couldn't refresh session"));
+                .orElseThrow(() -> new IOException("Couldn't refresh session"));
             authenticationResource.retireAccessToken(oldAccessToken);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             exception.printStackTrace();
         }
     }
@@ -135,7 +135,7 @@ public final class DefaultFortnite implements Fortnite {
         // TODO log exceptions
         try {
             authenticationResource.retireAccessToken(nonExpiredSessionToken().accessToken());
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             exception.printStackTrace();
         }
         HttpClientUtils.closeQuietly(httpClient);
@@ -152,7 +152,7 @@ public final class DefaultFortnite implements Fortnite {
         private String epicGamesLauncherToken = "MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=";
         private String fortniteClientToken = "ZWM2ODRiOGM2ODdmNDc5ZmFkZWEzY2IyYWQ4M2Y1YzY6ZTFmMzFjMjExZjI4NDEzMTg2MjYyZDM3YTEzZmM4NGQ=";
 
-        private Builder(String epicGamesEmailAddress, String epicGamesPassword) {
+        private Builder(final String epicGamesEmailAddress, final String epicGamesPassword) {
             this.epicGamesEmailAddress = epicGamesEmailAddress;
             this.epicGamesPassword = epicGamesPassword;
         }
@@ -164,7 +164,8 @@ public final class DefaultFortnite implements Fortnite {
          * @throws NullPointerException if {@code epicGamesEmailAddress} is {@code null}
          * @throws NullPointerException if {@code epicGamesPassword} is {@code null}
          */
-        public static Builder newInstance(String epicGamesEmailAddress, String epicGamesPassword) {
+        public static Builder newInstance(final String epicGamesEmailAddress,
+                                          final String epicGamesPassword) {
             Objects.requireNonNull(epicGamesEmailAddress, "epicGamesEmailAddress cannot be null");
             Objects.requireNonNull(epicGamesPassword, "epicGamesPassword cannot be null");
             return new Builder(epicGamesEmailAddress, epicGamesPassword);
@@ -175,7 +176,7 @@ public final class DefaultFortnite implements Fortnite {
          * @return the {@link Builder} instance this was called on
          * @throws NullPointerException if {@code epicGamesLauncherToken} is {@code null}
          */
-        public Builder setEpicGamesLauncherToken(String epicGamesLauncherToken) {
+        public Builder setEpicGamesLauncherToken(final String epicGamesLauncherToken) {
             this.epicGamesLauncherToken = Objects.requireNonNull(epicGamesLauncherToken, "epicGamesLauncherToken cannot be null");
             return this;
         }
@@ -185,7 +186,7 @@ public final class DefaultFortnite implements Fortnite {
          * @return the {@link Builder} instance this was called on
          * @throws NullPointerException if {@code fortniteClientToken} is {@code null}
          */
-        public Builder setFortniteClientToken(String fortniteClientToken) {
+        public Builder setFortniteClientToken(final String fortniteClientToken) {
             this.fortniteClientToken = Objects.requireNonNull(fortniteClientToken, "fortniteClientToken cannot be null");
             return this;
         }
@@ -197,7 +198,7 @@ public final class DefaultFortnite implements Fortnite {
         public Fortnite build() {
             try {
                 return new DefaultFortnite(this);
-            } catch (IOException exception) {
+            } catch (final IOException exception) {
                 throw new IllegalStateException("Error occurred when establishing session", exception);
             }
         }

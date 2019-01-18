@@ -9,7 +9,7 @@ public enum Platform {
 
     private final String code;
 
-    Platform(String code) {
+    Platform(final String code) {
         this.code = code;
     }
 

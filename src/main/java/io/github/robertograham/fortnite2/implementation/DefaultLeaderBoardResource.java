@@ -28,79 +28,76 @@ final class DefaultLeaderBoardResource implements LeaderBoardResource {
     private final Supplier<String> accessTokenSupplier;
     private final Supplier<String> inAppIdSupplier;
 
-    private DefaultLeaderBoardResource(CloseableHttpClient httpClient,
-                                       OptionalResponseHandlerProvider optionalResponseHandlerProvider,
-                                       Supplier<String> accessTokenSupplier,
-                                       Supplier<String> inAppIdSupplier) {
+    private DefaultLeaderBoardResource(final CloseableHttpClient httpClient,
+                                       final OptionalResponseHandlerProvider optionalResponseHandlerProvider,
+                                       final Supplier<String> accessTokenSupplier,
+                                       final Supplier<String> inAppIdSupplier) {
         this.httpClient = httpClient;
         this.optionalResponseHandlerProvider = optionalResponseHandlerProvider;
         this.accessTokenSupplier = accessTokenSupplier;
         this.inAppIdSupplier = inAppIdSupplier;
     }
 
-    static DefaultLeaderBoardResource newInstance(CloseableHttpClient httpClient,
-                                                  OptionalResponseHandlerProvider optionalResponseHandlerProvider,
-                                                  Supplier<String> sessionTokenSupplier,
-                                                  Supplier<String> inAppIdSupplier) {
+    static DefaultLeaderBoardResource newInstance(final CloseableHttpClient httpClient,
+                                                  final OptionalResponseHandlerProvider optionalResponseHandlerProvider,
+                                                  final Supplier<String> sessionTokenSupplier,
+                                                  final Supplier<String> inAppIdSupplier) {
         return new DefaultLeaderBoardResource(
-                httpClient,
-                optionalResponseHandlerProvider,
-                sessionTokenSupplier,
-                inAppIdSupplier
+            httpClient,
+            optionalResponseHandlerProvider,
+            sessionTokenSupplier,
+            inAppIdSupplier
         );
     }
 
-    private Optional<List<String>> cohortAccounts(Platform platform, PartyType partyType) throws IOException {
+    private Optional<List<String>> cohortAccounts(final Platform platform,
+                                                  final PartyType partyType) throws IOException {
         return httpClient.execute(
-                RequestBuilder.get("https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/leaderboards/cohort/" + inAppIdSupplier.get())
-                        .addParameter("playlist", String.format("%s_m0_%s", platform.code(), partyType.code()))
-                        .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
-                        .build(),
-                optionalResponseHandlerProvider.forClass(Cohort.class)
+            RequestBuilder.get("https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/leaderboards/cohort/" + inAppIdSupplier.get())
+                .addParameter("playlist", String.format("%s_m0_%s", platform.code(), partyType.code()))
+                .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
+                .build(),
+            optionalResponseHandlerProvider.forClass(Cohort.class)
         )
-                .map(Cohort::cohortAccounts);
+            .map(Cohort::cohortAccounts);
     }
 
     @Override
-    public Optional<List<LeaderBoardEntry>> findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason(Platform platform, PartyType partyType, int maxEntries) throws IOException {
+    public Optional<List<LeaderBoardEntry>> findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason(final Platform platform,
+                                                                                                       final PartyType partyType,
+                                                                                                       final int maxEntries) throws IOException {
         Objects.requireNonNull(platform, "platform cannot be null");
         Objects.requireNonNull(partyType, "partyType cannot be null");
         if (maxEntries < 0 || maxEntries > 1000)
             throw new IllegalArgumentException("maxEntries cannot be less than 0 or greater than 1000");
         return httpClient.execute(
-                RequestBuilder.post(String.format(
-                        "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/leaderboards/type/global/stat/br_placetop1_%s_m0_%s/window/weekly",
-                        platform.code(),
-                        partyType.code()
-                ))
-                        .addParameter(OWNER_TYPE_PARAMETER)
-                        .addParameter(PAGE_NUMBER_PARAMETER)
-                        .addParameter("itemsPerPage", String.valueOf(maxEntries))
-                        .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
-                        .setEntity(
-                                EntityBuilder.create()
-                                        .setContentType(APPLICATION_JSON)
-                                        .setText(
-                                                Json.createArrayBuilder(
-                                                        cohortAccounts(platform, partyType)
-                                                                .orElseGet(ArrayList::new)
-                                                )
-                                                        .build()
-                                                        .toString()
-                                        )
-                                        .build()
-                        )
-                        .build(),
-                optionalResponseHandlerProvider.forClass(RawLeaderBoard.class)
+            RequestBuilder.post(String.format(
+                "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/leaderboards/type/global/stat/br_placetop1_%s_m0_%s/window/weekly",
+                platform.code(),
+                partyType.code()
+            ))
+                .addParameter(OWNER_TYPE_PARAMETER)
+                .addParameter(PAGE_NUMBER_PARAMETER)
+                .addParameter("itemsPerPage", String.valueOf(maxEntries))
+                .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
+                .setEntity(EntityBuilder.create()
+                    .setContentType(APPLICATION_JSON)
+                    .setText(Json.createArrayBuilder(cohortAccounts(platform, partyType)
+                        .orElseGet(ArrayList::new))
+                        .build()
+                        .toString())
+                    .build())
+                .build(),
+            optionalResponseHandlerProvider.forClass(RawLeaderBoard.class)
         )
-                .map(RawLeaderBoard::leaderBoardEntries)
-                .map(leaderBoardEntries ->
-                        leaderBoardEntries.stream()
-                                .sorted(
-                                        Comparator.comparingLong(LeaderBoardEntry::value)
-                                                .reversed()
-                                )
-                                .collect(Collectors.toList())
-                );
+            .map(RawLeaderBoard::leaderBoardEntries)
+            .map(leaderBoardEntries ->
+                leaderBoardEntries.stream()
+                    .sorted(
+                        Comparator.comparingLong(LeaderBoardEntry::value)
+                            .reversed()
+                    )
+                    .collect(Collectors.toList())
+            );
     }
 }

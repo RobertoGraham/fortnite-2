@@ -65,7 +65,7 @@ class DefaultAccountResourceTest {
     @Test
     @DisplayName("findOneByDisplayName executes correct request")
     void findOneByDisplayNameUsesCorrectRequest() throws IOException {
-        ResponseHandler<Optional<DefaultAccount>> responseHandler = response -> Optional.empty();
+        final ResponseHandler<Optional<DefaultAccount>> responseHandler = response -> Optional.empty();
         when(mockOptionalResponseHandlerProvider.forClass(DefaultAccount.class))
                 .thenReturn(responseHandler);
         when(mockHttpClient.execute(any(HttpUriRequest.class), any(ResponseHandler.class)))
@@ -76,7 +76,7 @@ class DefaultAccountResourceTest {
         verify(mockHttpClient, times(1))
                 .execute(requestArgumentCaptor.capture(), defaultAccountOptionalResponseHandlerArgumentCaptor.capture());
         assertEquals(responseHandler, defaultAccountOptionalResponseHandlerArgumentCaptor.getValue());
-        HttpUriRequest actualRequest = requestArgumentCaptor.getValue();
+        final HttpUriRequest actualRequest = requestArgumentCaptor.getValue();
         assertEquals(HttpGet.METHOD_NAME, actualRequest.getMethod());
         assertEquals(
                 URI.create("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup?q=displayName"),
@@ -92,7 +92,7 @@ class DefaultAccountResourceTest {
     @Test
     @DisplayName("findOneBySessionAccountId executes correct request")
     void findOneBySessionAccountIdUsesCorrectRequest() throws IOException {
-        ResponseHandler<Optional<DefaultAccount[]>> responseHandler = response -> Optional.empty();
+        final ResponseHandler<Optional<DefaultAccount[]>> responseHandler = response -> Optional.empty();
         when(mockOptionalResponseHandlerProvider.forClass(DefaultAccount[].class))
                 .thenReturn(responseHandler);
         when(mockHttpClient.execute(any(HttpUriRequest.class), any(ResponseHandler.class)))
@@ -105,7 +105,7 @@ class DefaultAccountResourceTest {
         verify(mockHttpClient, times(1))
                 .execute(requestArgumentCaptor.capture(), defaultAccountOptionalArrayResponseHandlerArgumentCaptor.capture());
         assertEquals(responseHandler, defaultAccountOptionalArrayResponseHandlerArgumentCaptor.getValue());
-        HttpUriRequest actualRequest = requestArgumentCaptor.getValue();
+        final HttpUriRequest actualRequest = requestArgumentCaptor.getValue();
         assertEquals(HttpGet.METHOD_NAME, actualRequest.getMethod());
         assertEquals(
                 URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account?accountId=accountId"),

@@ -16,12 +16,12 @@ final class Token {
     private final String inAppId;
     private final String accountId;
 
-    private Token(String accessToken,
-                  LocalDateTime expiresAt,
-                  String refreshToken,
-                  LocalDateTime refreshExpiresAt,
-                  String inAppId,
-                  String accountId) {
+    private Token(final String accessToken,
+                  final LocalDateTime expiresAt,
+                  final String refreshToken,
+                  final LocalDateTime refreshExpiresAt,
+                  final String inAppId,
+                  final String accountId) {
         this.accessToken = accessToken;
         this.expiresAt = expiresAt;
         this.refreshToken = refreshToken;
@@ -57,28 +57,28 @@ final class Token {
     @Override
     public String toString() {
         return "Token{" +
-                "accessToken='" + accessToken + '\'' +
-                ", expiresAt=" + expiresAt +
-                ", refreshToken='" + refreshToken + '\'' +
-                ", refreshExpiresAt=" + refreshExpiresAt +
-                ", inAppId='" + inAppId + '\'' +
-                ", accountId='" + accountId + '\'' +
-                '}';
+            "accessToken='" + accessToken + '\'' +
+            ", expiresAt=" + expiresAt +
+            ", refreshToken='" + refreshToken + '\'' +
+            ", refreshExpiresAt=" + refreshExpiresAt +
+            ", inAppId='" + inAppId + '\'' +
+            ", accountId='" + accountId + '\'' +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof Token))
             return false;
-        Token token = (Token) object;
+        final Token token = (Token) object;
         return accessToken.equals(token.accessToken) &&
-                expiresAt.equals(token.expiresAt) &&
-                refreshToken.equals(token.refreshToken) &&
-                refreshExpiresAt.equals(token.refreshExpiresAt) &&
-                inAppId.equals(token.inAppId) &&
-                accountId.equals(token.accountId);
+            expiresAt.equals(token.expiresAt) &&
+            refreshToken.equals(token.refreshToken) &&
+            refreshExpiresAt.equals(token.refreshExpiresAt) &&
+            inAppId.equals(token.inAppId) &&
+            accountId.equals(token.accountId);
     }
 
     @Override
@@ -91,25 +91,25 @@ final class Token {
         INSTANCE;
 
         @Override
-        public JsonObject adaptToJson(Token token) {
+        public JsonObject adaptToJson(final Token token) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Token adaptFromJson(JsonObject jsonObject) {
+        public Token adaptFromJson(final JsonObject jsonObject) {
             return new Token(
-                    jsonObject.getString("access_token"),
-                    LocalDateTime.ofInstant(
-                            Instant.parse(jsonObject.getString("expires_at")),
-                            ZoneOffset.UTC
-                    ),
-                    jsonObject.getString("refresh_token"),
-                    LocalDateTime.ofInstant(
-                            Instant.parse(jsonObject.getString("refresh_expires_at")),
-                            ZoneOffset.UTC
-                    ),
-                    jsonObject.getString("in_app_id"),
-                    jsonObject.getString("account_id")
+                jsonObject.getString("access_token"),
+                LocalDateTime.ofInstant(
+                    Instant.parse(jsonObject.getString("expires_at")),
+                    ZoneOffset.UTC
+                ),
+                jsonObject.getString("refresh_token"),
+                LocalDateTime.ofInstant(
+                    Instant.parse(jsonObject.getString("refresh_expires_at")),
+                    ZoneOffset.UTC
+                ),
+                jsonObject.getString("in_app_id"),
+                jsonObject.getString("account_id")
             );
         }
     }

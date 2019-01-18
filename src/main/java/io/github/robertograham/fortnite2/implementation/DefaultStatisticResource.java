@@ -21,46 +21,47 @@ final class DefaultStatisticResource implements StatisticResource {
     private final Supplier<String> accessTokenSupplier;
     private final Supplier<String> sessionAccountIdSupplier;
 
-    private DefaultStatisticResource(CloseableHttpClient httpClient,
-                                     OptionalResponseHandlerProvider optionalResponseHandlerProvider,
-                                     Supplier<String> accessTokenSupplier,
-                                     Supplier<String> sessionAccountIdSupplier) {
+    private DefaultStatisticResource(final CloseableHttpClient httpClient,
+                                     final OptionalResponseHandlerProvider optionalResponseHandlerProvider,
+                                     final Supplier<String> accessTokenSupplier,
+                                     final Supplier<String> sessionAccountIdSupplier) {
         this.httpClient = httpClient;
         this.optionalResponseHandlerProvider = optionalResponseHandlerProvider;
         this.accessTokenSupplier = accessTokenSupplier;
         this.sessionAccountIdSupplier = sessionAccountIdSupplier;
     }
 
-    static DefaultStatisticResource newInstance(CloseableHttpClient httpClient,
-                                                OptionalResponseHandlerProvider optionalResponseHandlerProvider,
-                                                Supplier<String> sessionTokenSupplier,
-                                                Supplier<String> sessionAccountIdSupplier) {
+    static DefaultStatisticResource newInstance(final CloseableHttpClient httpClient,
+                                                final OptionalResponseHandlerProvider optionalResponseHandlerProvider,
+                                                final Supplier<String> sessionTokenSupplier,
+                                                final Supplier<String> sessionAccountIdSupplier) {
         return new DefaultStatisticResource(
-                httpClient,
-                optionalResponseHandlerProvider,
-                sessionTokenSupplier,
-                sessionAccountIdSupplier
+            httpClient,
+            optionalResponseHandlerProvider,
+            sessionTokenSupplier,
+            sessionAccountIdSupplier
         );
     }
 
-    private Optional<FilterableStatistic> findAllByAccountIdForWindow(String accountId, String window) throws IOException {
+    private Optional<FilterableStatistic> findAllByAccountIdForWindow(final String accountId,
+                                                                      final String window) throws IOException {
         return httpClient.execute(
-                RequestBuilder.get(String.format(
-                        "%s/%s/bulk/window/%s",
-                        "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/stats/accountId",
-                        accountId,
-                        window
-                ))
-                        .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
-                        .build(),
-                optionalResponseHandlerProvider.forClass(RawStatistic[].class)
+            RequestBuilder.get(String.format(
+                "%s/%s/bulk/window/%s",
+                "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/stats/accountId",
+                accountId,
+                window
+            ))
+                .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
+                .build(),
+            optionalResponseHandlerProvider.forClass(RawStatistic[].class)
         )
-                .map(rawStatistics -> new HashSet<>(Arrays.asList(rawStatistics)))
-                .map(DefaultFilterableStatistic::new);
+            .map(rawStatistics -> new HashSet<>(Arrays.asList(rawStatistics)))
+            .map(DefaultFilterableStatistic::new);
     }
 
     @Override
-    public Optional<FilterableStatistic> findAllByAccountIdForAllTime(String accountId) throws IOException {
+    public Optional<FilterableStatistic> findAllByAccountIdForAllTime(final String accountId) throws IOException {
         Objects.requireNonNull(accountId, "accountId cannot be null");
         return findAllByAccountIdForWindow(accountId, "alltime");
     }
@@ -71,7 +72,7 @@ final class DefaultStatisticResource implements StatisticResource {
     }
 
     @Override
-    public Optional<FilterableStatistic> findAllByAccountIdForCurrentSeason(String accountId) throws IOException {
+    public Optional<FilterableStatistic> findAllByAccountIdForCurrentSeason(final String accountId) throws IOException {
         Objects.requireNonNull(accountId, "accountId cannot be null");
         return findAllByAccountIdForWindow(accountId, "weekly");
     }

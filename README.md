@@ -19,7 +19,7 @@ Features:
 <properties>
   ...
   <!-- Use the latest version whenever possible. -->
-  <fortnite-2.version>1.0.2</fortnite-2.version>
+  <fortnite-2.version>1.2.0</fortnite-2.version>
   ...
 </properties>
 
@@ -46,9 +46,9 @@ import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        Fortnite fortnite = builder.build();
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        final Fortnite fortnite = builder.build();
     }
 }
 ```
@@ -61,11 +61,11 @@ import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword")
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword")
                 .setEpicGamesLauncherToken("launcherToken")
                 .setFortniteClientToken("clientToken");
-        Fortnite fortnite = builder.build();
+        final Fortnite fortnite = builder.build();
     }
 }
 ```
@@ -82,9 +82,9 @@ import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        Fortnite fortnite = builder.build();
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        final Fortnite fortnite = builder.build();
         fortnite.close();
     }
 }
@@ -102,17 +102,17 @@ import java.util.Optional;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
-            Optional<Account> account = fortnite.account()
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final Optional<Account> account = fortnite.account()
                     .findOneByDisplayName("RobertoGraham");
             // nothing printed if the response was empty
             account.map(Account::accountId)
                     .ifPresent(System.out::println);
             account.map(Account::displayName)
                     .ifPresent(System.out::println);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
         }
     }
@@ -131,17 +131,17 @@ import java.util.Optional;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
-            Optional<Account> account = fortnite.account()
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final Optional<Account> account = fortnite.account()
                     .findOneBySessionAccountId();
             // nothing printed if the response was empty
             account.map(Account::accountId)
                     .ifPresent(System.out::println);
             account.map(Account::displayName)
                     .ifPresent(System.out::println);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             // findOneBySessionAccountId unexpected response
         }
     }
@@ -161,23 +161,23 @@ import java.util.Set;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
-            String accountId1 = fortnite.account()
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final String accountId1 = fortnite.account()
                     .findOneByDisplayName("RobertoGraham")
                     .map(Account::accountId)
                     .orElse("");
-            String accountId2 = fortnite.account()
+            final String accountId2 = fortnite.account()
                     .findOneByDisplayName("Ninja")
                     .map(Account::accountId)
                     .orElse("");
             // accounts will be empty if the response was empty
             // OR if every account ID was invalid
-            Set<Account> accounts = fortnite.account()
+            final Set<Account> accounts = fortnite.account()
                     .findAllByAccountIds(accountId1, accountId2)
                     .orElseGet(HashSet::new);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountIds unexpected response
         }
@@ -199,33 +199,33 @@ import java.io.IOException;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
-            Account account = fortnite.account()
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final Account account = fortnite.account()
                     .findOneByDisplayName("RobertoGraham")
                     .orElseThrow(IllegalStateException::new);
-            String accountId = account.accountId();
+            final String accountId = account.accountId();
             // if any null then we received an empty response
-            FilterableStatistic fromAccountAllTime = fortnite.statistic()
+            final FilterableStatistic fromAccountAllTime = fortnite.statistic()
                     .findAllByAccountForAllTime(account)
                     .orElse(null);
-            FilterableStatistic fromAccountIdAllTime = fortnite.statistic()
+            final FilterableStatistic fromAccountIdAllTime = fortnite.statistic()
                     .findAllByAccountIdForAllTime(accountId)
                     .orElse(null);
-            FilterableStatistic fromAccountCurrentSeason = fortnite.statistic()
+            final FilterableStatistic fromAccountCurrentSeason = fortnite.statistic()
                     .findAllByAccountForCurrentSeason(account)
                     .orElse(null);
-            FilterableStatistic fromAccountIdCurrentSeason = fortnite.statistic()
+            final FilterableStatistic fromAccountIdCurrentSeason = fortnite.statistic()
                     .findAllByAccountIdForCurrentSeason(accountId)
                     .orElse(null);
             FilterableStatistic fromSessionAccountIdAllTime = fortnite.statistic()
                     .findAllBySessionAccountIdForAllTime()
                     .orElse(null);
-            FilterableStatistic fromSessionAccountIdCurrentSeason = fortnite.statistic()
+            final FilterableStatistic fromSessionAccountIdCurrentSeason = fortnite.statistic()
                     .findAllBySessionAccountIdForCurrentSeason()
                     .orElse(null);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
             // OR findAllByAccountIdForAllTime unexpected response
@@ -254,18 +254,18 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PC;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
-            Account account = fortnite.account()
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final Account account = fortnite.account()
                     .findOneByDisplayName("RobertoGraham")
                     .orElseThrow(IllegalStateException::new);
-            PartyTypeFilterableStatistic onePlatformPartyFilterable = fortnite.statistic()
+            final PartyTypeFilterableStatistic onePlatformPartyFilterable = fortnite.statistic()
                     .findAllByAccountForAllTime(account)
                     .map(filterableStatistic -> filterableStatistic.byPlatform(PC))
                     .orElseThrow(IllegalStateException::new);
-            Statistic onePlatformOnePartyType = onePlatformPartyFilterable.byPartyType(SQUAD);
-        } catch (IOException exception) {
+            final Statistic onePlatformOnePartyType = onePlatformPartyFilterable.byPartyType(SQUAD);
+        } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
         }
@@ -289,18 +289,18 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PS4;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
-            Account account = fortnite.account()
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final Account account = fortnite.account()
                     .findOneByDisplayName("RobertoGraham")
                     .orElseThrow(IllegalStateException::new);
-            PlatformFilterableStatistic onePartyTypePlatformFilterable = fortnite.statistic()
+            final PlatformFilterableStatistic onePartyTypePlatformFilterable = fortnite.statistic()
                     .findAllByAccountForAllTime(account)
                     .map(filterableStatistic -> filterableStatistic.byPartyType(SOLO))
                     .orElseThrow(IllegalStateException::new);
-            Statistic onePartyTypeOnePlatform = onePartyTypePlatformFilterable.byPlatform(PS4);
-        } catch (IOException exception) {
+            final Statistic onePartyTypeOnePlatform = onePartyTypePlatformFilterable.byPlatform(PS4);
+        } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
         }
@@ -323,13 +323,13 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.XB1;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
-            Account account = fortnite.account()
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final Account account = fortnite.account()
                     .findOneByDisplayName("RobertoGraham")
                     .orElseThrow(IllegalStateException::new);
-            Statistic statistic = fortnite.statistic()
+            final Statistic statistic = fortnite.statistic()
                     .findAllByAccountForAllTime(account)
                     .map(filterableStatistic ->
                             filterableStatistic
@@ -337,7 +337,7 @@ public class Main {
                                     .byPartyType(DUO)
                     )
                     .orElse(null);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
         }
@@ -363,13 +363,13 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PS4;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
             Account account = fortnite.account()
                     .findOneByDisplayName("RobertoGraham")
                     .orElseThrow(IllegalStateException::new);
-            Optional<FilterableStatistic> filterableStatistic = fortnite.statistic()
+            final Optional<FilterableStatistic> filterableStatistic = fortnite.statistic()
                     .findAllByAccountForAllTime(account);
             // prints 761 at time of writing
             filterableStatistic.map(FilterableStatistic::kills)
@@ -390,7 +390,7 @@ public class Main {
             )
                     .map(Statistic::kills)
                     .ifPresent(System.out::println);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
         }
@@ -428,13 +428,13 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PC;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (Fortnite fortnite = builder.build()) {
-            List<LeaderBoardEntry> entries = fortnite.leaderBoard()
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final List<LeaderBoardEntry> entries = fortnite.leaderBoard()
                     .findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason(PC, SOLO, 5)
                     .orElseThrow(IllegalStateException::new);
-            Map<String, Account> accountIdToAccountMap = fortnite.account()
+            final Map<String, Account> accountIdToAccountMap = fortnite.account()
                     .findAllByAccountIds(
                             entries.stream()
                                     .map(LeaderBoardEntry::accountId)
@@ -455,7 +455,7 @@ public class Main {
                             )
                     )
                     .forEach(System.out::println);
-        } catch (IOException exception) {
+        } catch (final IOException exception) {
             // findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason unexpected response
             // OR findAllByAccountIds unexpected response
         }

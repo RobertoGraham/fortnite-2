@@ -25,7 +25,7 @@ public interface StatisticResource {
      * @throws NullPointerException if {@code accountId} is {@code null}
      * @since 1.0.0
      */
-    Optional<FilterableStatistic> findAllByAccountIdForAllTime(String accountId) throws IOException;
+    Optional<FilterableStatistic> findAllByAccountIdForAllTime(final String accountId) throws IOException;
 
     /**
      * @param account Epic Games account to fetch all time statistics for
@@ -37,7 +37,7 @@ public interface StatisticResource {
      * @throws NullPointerException if {@code account} is {@code null}
      * @since 1.0.0
      */
-    default Optional<FilterableStatistic> findAllByAccountForAllTime(Account account) throws IOException {
+    default Optional<FilterableStatistic> findAllByAccountForAllTime(final Account account) throws IOException {
         Objects.requireNonNull(account, "account cannot be null");
         return findAllByAccountIdForAllTime(account.accountId());
     }
@@ -65,7 +65,7 @@ public interface StatisticResource {
      * @throws NullPointerException if {@code accountId} is {@code null}
      * @since 1.0.0
      */
-    Optional<FilterableStatistic> findAllByAccountIdForCurrentSeason(String accountId) throws IOException;
+    Optional<FilterableStatistic> findAllByAccountIdForCurrentSeason(final String accountId) throws IOException;
 
     /**
      * @param account Epic Games account to fetch current season statistics for
@@ -77,7 +77,7 @@ public interface StatisticResource {
      * @throws NullPointerException if {@code account} is {@code null}
      * @since 1.0.0
      */
-    default Optional<FilterableStatistic> findAllByAccountForCurrentSeason(Account account) throws IOException {
+    default Optional<FilterableStatistic> findAllByAccountForCurrentSeason(final Account account) throws IOException {
         Objects.requireNonNull(account, "account cannot be null");
         return findAllByAccountIdForCurrentSeason(account.accountId());
     }

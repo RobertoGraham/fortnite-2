@@ -11,7 +11,7 @@ final class RawLeaderBoard {
 
     private final List<LeaderBoardEntry> leaderBoardEntries;
 
-    private RawLeaderBoard(List<LeaderBoardEntry> leaderBoardEntries) {
+    private RawLeaderBoard(final List<LeaderBoardEntry> leaderBoardEntries) {
         this.leaderBoardEntries = leaderBoardEntries;
     }
 
@@ -22,17 +22,17 @@ final class RawLeaderBoard {
     @Override
     public String toString() {
         return "RawLeaderBoard{" +
-                "leaderBoardEntries=" + leaderBoardEntries +
-                '}';
+            "leaderBoardEntries=" + leaderBoardEntries +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof RawLeaderBoard))
             return false;
-        RawLeaderBoard rawLeaderBoard = (RawLeaderBoard) object;
+        final RawLeaderBoard rawLeaderBoard = (RawLeaderBoard) object;
         return leaderBoardEntries.equals(rawLeaderBoard.leaderBoardEntries);
     }
 
@@ -46,22 +46,22 @@ final class RawLeaderBoard {
         INSTANCE;
 
         @Override
-        public JsonObject adaptToJson(RawLeaderBoard rawLeaderBoard) throws Exception {
+        public JsonObject adaptToJson(final RawLeaderBoard rawLeaderBoard) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public RawLeaderBoard adaptFromJson(JsonObject jsonObject) {
+        public RawLeaderBoard adaptFromJson(final JsonObject jsonObject) {
             return new RawLeaderBoard(
-                    jsonObject.getJsonArray("entries")
-                            .getValuesAs(jsonValue -> {
-                                final JsonObject leaderBoardEntryJsonObject = jsonValue.asJsonObject();
-                                return new DefaultLeaderBoardEntry(
-                                        leaderBoardEntryJsonObject.getString("accountId"),
-                                        leaderBoardEntryJsonObject.getJsonNumber("value")
-                                                .longValueExact()
-                                );
-                            })
+                jsonObject.getJsonArray("entries")
+                    .getValuesAs(jsonValue -> {
+                        final JsonObject leaderBoardEntryJsonObject = jsonValue.asJsonObject();
+                        return new DefaultLeaderBoardEntry(
+                            leaderBoardEntryJsonObject.getString("accountId"),
+                            leaderBoardEntryJsonObject.getJsonNumber("value")
+                                .longValueExact()
+                        );
+                    })
             );
         }
     }

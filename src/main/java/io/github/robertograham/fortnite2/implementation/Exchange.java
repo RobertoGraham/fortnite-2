@@ -8,7 +8,7 @@ final class Exchange {
 
     private final String code;
 
-    private Exchange(String code) {
+    private Exchange(final String code) {
         this.code = code;
     }
 
@@ -19,17 +19,17 @@ final class Exchange {
     @Override
     public String toString() {
         return "Exchange{" +
-                "code='" + code + '\'' +
-                '}';
+            "code='" + code + '\'' +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof Exchange))
             return false;
-        Exchange exchange = (Exchange) object;
+        final Exchange exchange = (Exchange) object;
         return Objects.equals(code, exchange.code);
     }
 
@@ -43,12 +43,12 @@ final class Exchange {
         INSTANCE;
 
         @Override
-        public JsonObject adaptToJson(Exchange exchange) {
+        public JsonObject adaptToJson(final Exchange exchange) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Exchange adaptFromJson(JsonObject jsonObject) {
+        public Exchange adaptFromJson(final JsonObject jsonObject) {
             return new Exchange(jsonObject.getString("code"));
         }
     }

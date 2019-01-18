@@ -20,25 +20,23 @@ import java.util.Optional;
 enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvider {
 
     INSTANCE(
-            Token.Adapter.INSTANCE,
-            Exchange.Adapter.INSTANCE,
-            DefaultAccount.Adapter.INSTANCE,
-            RawStatistic.Adapter.INSTANCE,
-            Cohort.Adapter.INSTANCE,
-            RawLeaderBoard.Adapter.INSTANCE
+        Token.Adapter.INSTANCE,
+        Exchange.Adapter.INSTANCE,
+        DefaultAccount.Adapter.INSTANCE,
+        RawStatistic.Adapter.INSTANCE,
+        Cohort.Adapter.INSTANCE,
+        RawLeaderBoard.Adapter.INSTANCE
     );
 
     private final ResponseHandler<Optional<String>> stringOptionalHandler;
     private final Jsonb jsonb;
 
-    JsonOptionalResponseHandlerProvider(JsonbAdapter... jsonbAdapters) {
+    JsonOptionalResponseHandlerProvider(final JsonbAdapter... jsonbAdapters) {
         stringOptionalHandler = responseHandlerFromHttpEntityToOptionalResultMapper(
-                httpEntity -> Optional.ofNullable(EntityUtils.toString(httpEntity))
+            httpEntity -> Optional.ofNullable(EntityUtils.toString(httpEntity))
         );
-        jsonb = JsonbBuilder.create(
-                new JsonbConfig()
-                        .withAdapters(jsonbAdapters)
-        );
+        jsonb = JsonbBuilder.create(new JsonbConfig()
+            .withAdapters(jsonbAdapters));
     }
 
     @Override
@@ -47,21 +45,21 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
     }
 
     @Override
-    public <T> ResponseHandler<Optional<T>> forClass(Class<T> tClass) {
+    public <T> ResponseHandler<Optional<T>> forClass(final Class<T> tClass) {
         return responseHandlerFromHttpEntityToOptionalResultMapper(
-                httpEntity -> {
-                    try (final InputStream inputStream = httpEntity.getContent()) {
-                        return Optional.ofNullable(inputStream)
-                                .map(nonNullInputStream ->
-                                        jsonb.fromJson(nonNullInputStream, tClass)
-                                );
-                    }
+            httpEntity -> {
+                try (final InputStream inputStream = httpEntity.getContent()) {
+                    return Optional.ofNullable(inputStream)
+                        .map(nonNullInputStream ->
+                            jsonb.fromJson(nonNullInputStream, tClass)
+                        );
                 }
+            }
         );
     }
 
     private <T> ResponseHandler<Optional<T>> responseHandlerFromHttpEntityToOptionalResultMapper(
-            final HttpEntityToOptionalResultMapper<T> httpEntityToOptionalResultMapper
+        final HttpEntityToOptionalResultMapper<T> httpEntityToOptionalResultMapper
     ) {
         return response -> {
             final StatusLine statusLine = response.getStatusLine();
@@ -69,21 +67,21 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
             final HttpEntity httpEntity = response.getEntity();
             if (statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_MULTIPLE_CHOICES)
                 return httpEntity == null ?
-                        Optional.empty()
-                        : httpEntityToOptionalResultMapper.mapHttpEntityToOptionalResult(httpEntity);
+                    Optional.empty()
+                    : httpEntityToOptionalResultMapper.mapHttpEntityToOptionalResult(httpEntity);
             EntityUtils.consumeQuietly(httpEntity);
             throw new HttpResponseException(
+                statusLine.getStatusCode(),
+                String.format(
+                    "[%d] %s",
                     statusLine.getStatusCode(),
-                    String.format(
-                            "[%d] %s",
-                            statusLine.getStatusCode(),
-                            Arrays.stream(response.getAllHeaders())
-                                    .filter(header -> "X-Epic-Error-Name".equals(header.getName()))
-                                    .findFirst()
-                                    .map(Header::getValue)
-                                    .filter(epicErrorName -> !epicErrorName.trim().isEmpty())
-                                    .orElseGet(statusLine::getReasonPhrase)
-                    )
+                    Arrays.stream(response.getAllHeaders())
+                        .filter(header -> "X-Epic-Error-Name".equals(header.getName()))
+                        .findFirst()
+                        .map(Header::getValue)
+                        .filter(epicErrorName -> !epicErrorName.trim().isEmpty())
+                        .orElseGet(statusLine::getReasonPhrase)
+                )
             );
         };
     }

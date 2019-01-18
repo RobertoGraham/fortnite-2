@@ -26,16 +26,14 @@ final class DefaultStatistic implements Statistic {
     private final long timesPlacedTop6;
     private final LocalDateTime timeLastModified;
 
-    DefaultStatistic(Set<RawStatistic> rawStatistics) {
+    DefaultStatistic(final Set<RawStatistic> rawStatistics) {
         final Map<String, Long> summedValuesGroupedByStatType =
-                rawStatistics.stream()
-                        .filter(rawStatistic -> !"lastmodified".equals(rawStatistic.type()))
-                        .collect(
-                                Collectors.groupingBy(
-                                        RawStatistic::type,
-                                        Collectors.summingLong(RawStatistic::value)
-                                )
-                        );
+            rawStatistics.stream()
+                .filter(rawStatistic -> !"lastmodified".equals(rawStatistic.type()))
+                .collect(Collectors.groupingBy(
+                        RawStatistic::type,
+                        Collectors.summingLong(RawStatistic::value)
+                    ));
         wins = summedValuesGroupedByStatType.getOrDefault("placetop1", 0L);
         matches = summedValuesGroupedByStatType.getOrDefault("matchesplayed", 0L);
         kills = summedValuesGroupedByStatType.getOrDefault("kills", 0L);
@@ -47,15 +45,15 @@ final class DefaultStatistic implements Statistic {
         timesPlacedTop3 = summedValuesGroupedByStatType.getOrDefault("placetop3", 0L);
         timesPlacedTop6 = summedValuesGroupedByStatType.getOrDefault("placetop6", 0L);
         timeLastModified = rawStatistics.stream()
-                .filter(rawStatistic -> "lastmodified".equals(rawStatistic.type()))
-                .max(Comparator.comparingLong(RawStatistic::value))
-                .map(rawStatistic ->
-                        LocalDateTime.ofInstant(
-                                Instant.ofEpochSecond(rawStatistic.value()),
-                                ZoneOffset.UTC
-                        )
+            .filter(rawStatistic -> "lastmodified".equals(rawStatistic.type()))
+            .max(Comparator.comparingLong(RawStatistic::value))
+            .map(rawStatistic ->
+                LocalDateTime.ofInstant(
+                    Instant.ofEpochSecond(rawStatistic.value()),
+                    ZoneOffset.UTC
                 )
-                .orElse(LocalDateTime.MIN);
+            )
+            .orElse(LocalDateTime.MIN);
     }
 
     @Override
@@ -116,38 +114,38 @@ final class DefaultStatistic implements Statistic {
     @Override
     public String toString() {
         return "DefaultStatistic{" +
-                "wins=" + wins +
-                ", matches=" + matches +
-                ", kills=" + kills +
-                ", score=" + score +
-                ", timesPlacedTop10=" + timesPlacedTop10 +
-                ", timesPlacedTop25=" + timesPlacedTop25 +
-                ", timesPlacedTop5=" + timesPlacedTop5 +
-                ", timesPlacedTop12=" + timesPlacedTop12 +
-                ", timesPlacedTop3=" + timesPlacedTop3 +
-                ", timesPlacedTop6=" + timesPlacedTop6 +
-                ", timeLastModified=" + timeLastModified +
-                '}';
+            "wins=" + wins +
+            ", matches=" + matches +
+            ", kills=" + kills +
+            ", score=" + score +
+            ", timesPlacedTop10=" + timesPlacedTop10 +
+            ", timesPlacedTop25=" + timesPlacedTop25 +
+            ", timesPlacedTop5=" + timesPlacedTop5 +
+            ", timesPlacedTop12=" + timesPlacedTop12 +
+            ", timesPlacedTop3=" + timesPlacedTop3 +
+            ", timesPlacedTop6=" + timesPlacedTop6 +
+            ", timeLastModified=" + timeLastModified +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof DefaultStatistic))
             return false;
-        DefaultStatistic defaultStatistic = (DefaultStatistic) object;
+        final DefaultStatistic defaultStatistic = (DefaultStatistic) object;
         return wins == defaultStatistic.wins &&
-                matches == defaultStatistic.matches &&
-                kills == defaultStatistic.kills &&
-                score == defaultStatistic.score &&
-                timesPlacedTop10 == defaultStatistic.timesPlacedTop10 &&
-                timesPlacedTop25 == defaultStatistic.timesPlacedTop25 &&
-                timesPlacedTop5 == defaultStatistic.timesPlacedTop5 &&
-                timesPlacedTop12 == defaultStatistic.timesPlacedTop12 &&
-                timesPlacedTop3 == defaultStatistic.timesPlacedTop3 &&
-                timesPlacedTop6 == defaultStatistic.timesPlacedTop6 &&
-                timeLastModified.equals(defaultStatistic.timeLastModified);
+            matches == defaultStatistic.matches &&
+            kills == defaultStatistic.kills &&
+            score == defaultStatistic.score &&
+            timesPlacedTop10 == defaultStatistic.timesPlacedTop10 &&
+            timesPlacedTop25 == defaultStatistic.timesPlacedTop25 &&
+            timesPlacedTop5 == defaultStatistic.timesPlacedTop5 &&
+            timesPlacedTop12 == defaultStatistic.timesPlacedTop12 &&
+            timesPlacedTop3 == defaultStatistic.timesPlacedTop3 &&
+            timesPlacedTop6 == defaultStatistic.timesPlacedTop6 &&
+            timeLastModified.equals(defaultStatistic.timeLastModified);
     }
 
     @Override

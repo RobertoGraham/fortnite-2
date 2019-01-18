@@ -9,8 +9,8 @@ final class DefaultLeaderBoardEntry implements LeaderBoardEntry {
     private final String accountId;
     private final long value;
 
-    DefaultLeaderBoardEntry(String accountId,
-                            long value) {
+    DefaultLeaderBoardEntry(final String accountId,
+                            final long value) {
         this.accountId = accountId;
         this.value = value;
     }
@@ -28,20 +28,20 @@ final class DefaultLeaderBoardEntry implements LeaderBoardEntry {
     @Override
     public String toString() {
         return "DefaultLeaderBoardEntry{" +
-                "accountId='" + accountId + '\'' +
-                ", value=" + value +
-                '}';
+            "accountId='" + accountId + '\'' +
+            ", value=" + value +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof DefaultLeaderBoardEntry))
             return false;
-        DefaultLeaderBoardEntry defaultLeaderBoardEntry = (DefaultLeaderBoardEntry) object;
+        final DefaultLeaderBoardEntry defaultLeaderBoardEntry = (DefaultLeaderBoardEntry) object;
         return value == defaultLeaderBoardEntry.value &&
-                accountId.equals(defaultLeaderBoardEntry.accountId);
+            accountId.equals(defaultLeaderBoardEntry.accountId);
     }
 
     @Override

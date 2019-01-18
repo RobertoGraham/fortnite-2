@@ -11,8 +11,8 @@ import io.github.robertograham.fortnite2.domain.enumeration.Platform;
 public interface FilterableStatistic extends PlatformFilterableStatistic, PartyTypeFilterableStatistic {
 
     @Override
-    PlatformFilterableStatistic byPartyType(PartyType partyType);
+    PlatformFilterableStatistic byPartyType(final PartyType partyType);
 
     @Override
-    PartyTypeFilterableStatistic byPlatform(Platform platform);
+    PartyTypeFilterableStatistic byPlatform(final Platform platform);
 }

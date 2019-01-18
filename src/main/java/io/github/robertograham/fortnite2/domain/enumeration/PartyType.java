@@ -9,7 +9,7 @@ public enum PartyType {
 
     private final String code;
 
-    PartyType(String code) {
+    PartyType(final String code) {
         this.code = code;
     }
 

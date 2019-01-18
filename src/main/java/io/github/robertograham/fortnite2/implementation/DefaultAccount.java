@@ -11,8 +11,8 @@ final class DefaultAccount implements Account {
     private final String accountId;
     private final String displayName;
 
-    private DefaultAccount(String accountId,
-                           String displayName) {
+    private DefaultAccount(final String accountId,
+                           final String displayName) {
         this.accountId = accountId;
         this.displayName = displayName;
     }
@@ -30,20 +30,20 @@ final class DefaultAccount implements Account {
     @Override
     public String toString() {
         return "DefaultAccount{" +
-                "accountId='" + accountId + '\'' +
-                ", displayName='" + displayName + '\'' +
-                '}';
+            "accountId='" + accountId + '\'' +
+            ", displayName='" + displayName + '\'' +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof DefaultAccount))
             return false;
-        DefaultAccount defaultAccount = (DefaultAccount) object;
+        final DefaultAccount defaultAccount = (DefaultAccount) object;
         return Objects.equals(accountId, defaultAccount.accountId) &&
-                Objects.equals(displayName, defaultAccount.displayName);
+            Objects.equals(displayName, defaultAccount.displayName);
     }
 
     @Override
@@ -56,15 +56,15 @@ final class DefaultAccount implements Account {
         INSTANCE;
 
         @Override
-        public JsonObject adaptToJson(DefaultAccount defaultAccount) {
+        public JsonObject adaptToJson(final DefaultAccount defaultAccount) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public DefaultAccount adaptFromJson(JsonObject jsonObject) {
+        public DefaultAccount adaptFromJson(final JsonObject jsonObject) {
             return new DefaultAccount(
-                    jsonObject.getString("id", null),
-                    jsonObject.getString("displayName", null)
+                jsonObject.getString("id", null),
+                jsonObject.getString("displayName", null)
             );
         }
     }

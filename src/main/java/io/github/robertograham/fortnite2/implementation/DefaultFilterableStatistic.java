@@ -14,29 +14,29 @@ import java.util.function.Predicate;
 final class DefaultFilterableStatistic extends StatisticFilterer implements FilterableStatistic {
 
     private static final Function<Platform, Predicate<RawStatistic>> RAW_STATISTIC_PREDICATE_FACTORY_PLATFORM =
-            platform ->
-                    rawStatistic -> platform.code().equals(rawStatistic.platform());
+        platform ->
+            rawStatistic -> platform.code().equals(rawStatistic.platform());
     private static final Function<PartyType, Predicate<RawStatistic>> RAW_STATISTIC_PREDICATE_FACTORY_PARTY_TYPE =
-            partyType ->
-                    rawStatistic -> partyType.code().equals(rawStatistic.partyType());
+        partyType ->
+            rawStatistic -> partyType.code().equals(rawStatistic.partyType());
 
-    DefaultFilterableStatistic(Set<RawStatistic> rawStatistics) {
+    DefaultFilterableStatistic(final Set<RawStatistic> rawStatistics) {
         super(rawStatistics);
     }
 
     @Override
-    public PartyTypeFilterable byPlatform(Platform platform) {
+    public PartyTypeFilterable byPlatform(final Platform platform) {
         return newFilteredStatistic(
-                RAW_STATISTIC_PREDICATE_FACTORY_PLATFORM.apply(platform),
-                PartyTypeFilterable::new
+            RAW_STATISTIC_PREDICATE_FACTORY_PLATFORM.apply(platform),
+            PartyTypeFilterable::new
         );
     }
 
     @Override
-    public PlatformFilterable byPartyType(PartyType partyType) {
+    public PlatformFilterable byPartyType(final PartyType partyType) {
         return newFilteredStatistic(
-                RAW_STATISTIC_PREDICATE_FACTORY_PARTY_TYPE.apply(partyType),
-                PlatformFilterable::new
+            RAW_STATISTIC_PREDICATE_FACTORY_PARTY_TYPE.apply(partyType),
+            PlatformFilterable::new
         );
     }
 
@@ -47,15 +47,15 @@ final class DefaultFilterableStatistic extends StatisticFilterer implements Filt
 
     private static final class PlatformFilterable extends StatisticFilterer implements PlatformFilterableStatistic {
 
-        private PlatformFilterable(Set<RawStatistic> rawStatistics) {
+        private PlatformFilterable(final Set<RawStatistic> rawStatistics) {
             super(rawStatistics);
         }
 
         @Override
-        public Statistic byPlatform(Platform platform) {
+        public Statistic byPlatform(final Platform platform) {
             return newFilteredStatistic(
-                    RAW_STATISTIC_PREDICATE_FACTORY_PLATFORM.apply(platform),
-                    DefaultStatistic::new
+                RAW_STATISTIC_PREDICATE_FACTORY_PLATFORM.apply(platform),
+                DefaultStatistic::new
             );
         }
 
@@ -67,15 +67,15 @@ final class DefaultFilterableStatistic extends StatisticFilterer implements Filt
 
     private static final class PartyTypeFilterable extends StatisticFilterer implements PartyTypeFilterableStatistic {
 
-        private PartyTypeFilterable(Set<RawStatistic> rawStatistics) {
+        private PartyTypeFilterable(final Set<RawStatistic> rawStatistics) {
             super(rawStatistics);
         }
 
         @Override
-        public Statistic byPartyType(PartyType partyType) {
+        public Statistic byPartyType(final PartyType partyType) {
             return newFilteredStatistic(
-                    RAW_STATISTIC_PREDICATE_FACTORY_PARTY_TYPE.apply(partyType),
-                    DefaultStatistic::new
+                RAW_STATISTIC_PREDICATE_FACTORY_PARTY_TYPE.apply(partyType),
+                DefaultStatistic::new
             );
         }
 

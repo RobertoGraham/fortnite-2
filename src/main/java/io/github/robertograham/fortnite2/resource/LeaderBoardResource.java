@@ -30,5 +30,7 @@ public interface LeaderBoardResource {
      * @throws IllegalArgumentException if {@code maxEntries} is less than 0 or greater than 1000
      * @since 1.0.0
      */
-    Optional<List<LeaderBoardEntry>> findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason(Platform platform, PartyType partyType, int maxEntries) throws IOException;
+    Optional<List<LeaderBoardEntry>> findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason(final Platform platform,
+                                                                                                final PartyType partyType,
+                                                                                                final int maxEntries) throws IOException;
 }

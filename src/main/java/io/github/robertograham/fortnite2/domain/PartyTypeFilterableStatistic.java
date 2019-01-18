@@ -14,5 +14,5 @@ public interface PartyTypeFilterableStatistic extends Statistic {
      * @return a {@link Statistic} with values scoped to {@code partyType}
      * @since 1.0.0
      */
-    Statistic byPartyType(PartyType partyType);
+    Statistic byPartyType(final PartyType partyType);
 }

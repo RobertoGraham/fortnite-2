@@ -14,5 +14,5 @@ public interface PlatformFilterableStatistic extends Statistic {
      * @return a {@link Statistic} with values scoped to {@code platform}
      * @since 1.0.0
      */
-    Statistic byPlatform(Platform platform);
+    Statistic byPlatform(final Platform platform);
 }

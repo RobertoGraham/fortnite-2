@@ -9,7 +9,7 @@ abstract class ForwardingStatistic implements Statistic {
 
     private final Statistic statistic;
 
-    ForwardingStatistic(Statistic statistic) {
+    ForwardingStatistic(final Statistic statistic) {
         this.statistic = statistic;
     }
 
@@ -71,17 +71,17 @@ abstract class ForwardingStatistic implements Statistic {
     @Override
     public String toString() {
         return "ForwardingStatistic{" +
-                "statistic=" + statistic +
-                '}';
+            "statistic=" + statistic +
+            '}';
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (this == object)
             return true;
         if (!(object instanceof ForwardingStatistic))
             return false;
-        ForwardingStatistic forwardingStatistic = (ForwardingStatistic) object;
+        final ForwardingStatistic forwardingStatistic = (ForwardingStatistic) object;
         return statistic.equals(forwardingStatistic.statistic);
     }
 
