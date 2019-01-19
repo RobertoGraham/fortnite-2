@@ -2,7 +2,7 @@ package io.github.robertograham.fortnite2.implementation;
 
 import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.resource.AccountResource;
-import io.github.robertograham.fortnite2.resource.FriendResource;
+import io.github.robertograham.fortnite2.resource.FriendRequestResource;
 import io.github.robertograham.fortnite2.resource.LeaderBoardResource;
 import io.github.robertograham.fortnite2.resource.StatisticResource;
 import org.apache.http.client.utils.HttpClientUtils;
@@ -15,7 +15,7 @@ import java.util.Objects;
 import static java.time.LocalDateTime.now;
 
 /**
- * Default implementation of {@link Fortnite} created using {@link Builder}
+ * Default implementation of {@link Fortnite} createdAt using {@link Builder}
  */
 public final class DefaultFortnite implements Fortnite {
 
@@ -28,7 +28,7 @@ public final class DefaultFortnite implements Fortnite {
     private final AuthenticationResource authenticationResource;
     private final LeaderBoardResource leaderBoardResource;
     private final StatisticResource statisticResource;
-    private final FriendResource friendResource;
+    private final FriendRequestResource friendRequestResource;
     private Token sessionToken;
 
     private DefaultFortnite(final Builder builder) throws IOException {
@@ -60,7 +60,7 @@ public final class DefaultFortnite implements Fortnite {
             () -> nonExpiredSessionToken().accessToken(),
             () -> nonExpiredSessionToken().accountId()
         );
-        friendResource = DefaultFriendResource.newInstance(
+        friendRequestResource = DefaultFriendRequestResource.newInstance(
             httpClient,
             JsonOptionalResponseHandlerProvider.INSTANCE,
             () -> nonExpiredSessionToken().accessToken(),
@@ -139,8 +139,8 @@ public final class DefaultFortnite implements Fortnite {
     }
 
     @Override
-    public FriendResource friend() {
-        return friendResource;
+    public FriendRequestResource friendRequest() {
+        return friendRequestResource;
     }
 
     @Override

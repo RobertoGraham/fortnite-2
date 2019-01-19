@@ -462,3 +462,51 @@ public class Main {
     }
 }
 ```
+
+### Friend request API
+
+Fetch both accepted and pending friend requests for the authenticated user
+
+```java
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+public class Main {
+
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            fortnite.friendRequest()
+                .findAllBySessionAccountId()
+                .ifPresent(System.out::println);
+        } catch (IOException exception) {
+            // findAllBySessionAccountId unexpected response
+        }
+    }
+}
+```
+
+Fetch only accepted friend requests for the authenticated user
+
+```java
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+public class Main {
+
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            fortnite.friendRequest()
+                .findAllNonPendingBySessionAccountId()
+                .ifPresent(System.out::println);
+        } catch (IOException exception) {
+            // findAllNonPendingBySessionAccountId unexpected response
+        }
+    }
+}
+```
