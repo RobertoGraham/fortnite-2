@@ -15,7 +15,7 @@ import java.util.Objects;
 import static java.time.LocalDateTime.now;
 
 /**
- * Default implementation of {@link Fortnite} createdAt using {@link Builder}
+ * Default implementation of {@link Fortnite} created using {@link Builder}
  */
 public final class DefaultFortnite implements Fortnite {
 
