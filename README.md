@@ -4,7 +4,7 @@
 
 A Java 8+ client for the APIs used by Epic Games Launcher and the Fortnite client
 
-Features:
+## Features
 
 * Authentication with Epic's APIs is managed internally
 * Fetching and filtering (by platform, party type, and time window) of an account's Battle Royale statistics
@@ -19,7 +19,7 @@ Features:
 <properties>
   ...
   <!-- Use the latest version whenever possible. -->
-  <fortnite-2.version>1.2.0</fortnite-2.version>
+  <fortnite-2.version>1.3.0</fortnite-2.version>
   ...
 </properties>
 
