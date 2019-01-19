@@ -462,3 +462,111 @@ public class Main {
     }
 }
 ```
+
+### Friend API
+
+Fetch both accepted and pending friend requests for the authenticated user
+
+```java
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+public class Main {
+
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            fortnite.friend()
+                .findAllRequestsBySessionAccountId()
+                .ifPresent(System.out::println);
+        } catch (final IOException exception) {
+            // findAllRequestsBySessionAccountId unexpected response
+        }
+    }
+}
+```
+
+Fetch only accepted friend requests for the authenticated user
+
+```java
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+public class Main {
+
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            fortnite.friend()
+                .findAllNonPendingRequestsBySessionAccountId()
+                .ifPresent(System.out::println);
+        } catch (final IOException exception) {
+            // findAllNonPendingRequestsBySessionAccountId unexpected response
+        }
+    }
+}
+```
+
+Delete a friend or a friend request using an account or an account ID
+
+```java
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+public class Main {
+
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final Account account = fortnite.account()
+                .findOneByDisplayName("RobertoGraham")
+                .orElseThrow(IllegalStateException::new);
+            fortnite.friend()
+                .deleteOneByAccount(account);
+            fortnite.friend()
+                .deleteOneByAccountId(account.accountId());
+        } catch (final IOException e) {
+            // findOneByDisplayName unexpected response
+            // OR deleteOneByAccount unexpected response
+            // OR deleteOneByAccountId unexpected response
+        }
+    }
+}
+```
+
+Add a friend or accept a friend request using an account or an account ID
+
+```java
+import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Account;
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+import java.io.IOException;
+
+public class Main {
+
+    public static void main(final String[] args) {
+        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final Fortnite fortnite = builder.build()) {
+            final Account account = fortnite.account()
+                .findOneByDisplayName("RobertoGraham")
+                .orElseThrow(IllegalStateException::new);
+            fortnite.friend()
+                .addOneByAccount(account);
+            fortnite.friend()
+                .addOneByAccountId(account.accountId());
+        } catch (final IOException exception) {
+            // findOneByDisplayName unexpected response
+            // OR addOneByAccount unexpected response
+            // OR addOneByAccountId unexpected response
+        }
+    }
+}
+```
