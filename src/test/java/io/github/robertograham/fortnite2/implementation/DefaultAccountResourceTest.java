@@ -79,7 +79,7 @@ class DefaultAccountResourceTest {
         final HttpUriRequest actualRequest = requestArgumentCaptor.getValue();
         assertEquals(HttpGet.METHOD_NAME, actualRequest.getMethod());
         assertEquals(
-                URI.create("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup?q=displayName"),
+                URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account/displayName/displayName"),
                 actualRequest.getURI()
         );
         assertTrue(Arrays.stream(actualRequest.getAllHeaders())
