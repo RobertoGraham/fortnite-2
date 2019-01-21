@@ -49,8 +49,11 @@ final class DefaultAccountResource implements AccountResource {
     public Optional<Account> findOneByDisplayName(final String displayName) throws IOException {
         Objects.requireNonNull(displayName, "displayName cannot be null");
         return httpClient.execute(
-            RequestBuilder.get("https://persona-public-service-prod06.ol.epicgames.com/persona/api/public/account/lookup")
-                .addParameter("q", displayName)
+            RequestBuilder.get(String.format(
+                "%s/%s",
+                "https://account-public-service-prod03.ol.epicgames.com/account/api/public/account/displayName",
+                displayName
+            ))
                 .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
                 .build(),
             optionalResponseHandlerProvider.forClass(DefaultAccount.class)
