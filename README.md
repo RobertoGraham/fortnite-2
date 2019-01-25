@@ -2,7 +2,7 @@
 
 # fortnite-2
 
-A Java 8+ client for the APIs used by Epic Games Launcher and the Fortnite client
+A Java 11+ client for the APIs used by Epic Games Launcher and the Fortnite client
 
 ## Features
 
@@ -19,7 +19,7 @@ A Java 8+ client for the APIs used by Epic Games Launcher and the Fortnite clien
 <properties>
   ...
   <!-- Use the latest version whenever possible. -->
-  <fortnite-2.version>1.3.0</fortnite-2.version>
+  <fortnite-2.version>2.0.0</fortnite-2.version>
   ...
 </properties>
 
@@ -41,14 +41,13 @@ A Java 8+ client for the APIs used by Epic Games Launcher and the Fortnite clien
 This is the simplest way to instantiate a client:
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        final Fortnite fortnite = builder.build();
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        final var fortnite = builder.build();
     }
 }
 ```
@@ -56,16 +55,15 @@ public class Main {
 If Epic Games ever deprecate this library's default launcher and client tokens, you may provide your own like this:
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword")
-                .setEpicGamesLauncherToken("launcherToken")
-                .setFortniteClientToken("clientToken");
-        final Fortnite fortnite = builder.build();
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword")
+            .setEpicGamesLauncherToken("launcherToken")
+            .setFortniteClientToken("clientToken");
+        final var fortnite = builder.build();
     }
 }
 ```
@@ -77,14 +75,13 @@ the client's underlying resources with a call to `Fortnite.close()`. Usage examp
 this call implicitly using `try`-with-resources statements.
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        final Fortnite fortnite = builder.build();
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        final var fortnite = builder.build();
         fortnite.close();
     }
 }
@@ -93,25 +90,23 @@ public class Main {
 ### Fetching an account using its username
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
-import java.util.Optional;
 
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final Optional<Account> account = fortnite.account()
-                    .findOneByDisplayName("RobertoGraham");
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var optionalAccount = fortnite.account()
+                .findOneByDisplayName("RobertoGraham");
             // nothing printed if the response was empty
-            account.map(Account::accountId)
-                    .ifPresent(System.out::println);
-            account.map(Account::displayName)
-                    .ifPresent(System.out::println);
+            optionalAccount.map(Account::accountId)
+                .ifPresent(System.out::println);
+            optionalAccount.map(Account::displayName)
+                .ifPresent(System.out::println);
         } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
         }
@@ -122,25 +117,23 @@ public class Main {
 ### Fetching an account using the session's account ID
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
-import java.util.Optional;
 
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final Optional<Account> account = fortnite.account()
-                    .findOneBySessionAccountId();
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var optionalAccount = fortnite.account()
+                .findOneBySessionAccountId();
             // nothing printed if the response was empty
-            account.map(Account::accountId)
-                    .ifPresent(System.out::println);
-            account.map(Account::displayName)
-                    .ifPresent(System.out::println);
+            optionalAccount.map(Account::accountId)
+                .ifPresent(System.out::println);
+            optionalAccount.map(Account::displayName)
+                .ifPresent(System.out::println);
         } catch (final IOException exception) {
             // findOneBySessionAccountId unexpected response
         }
@@ -151,32 +144,30 @@ public class Main {
 ### Fetching many accounts using their IDs
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
 
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final String accountId1 = fortnite.account()
-                    .findOneByDisplayName("RobertoGraham")
-                    .map(Account::accountId)
-                    .orElse("");
-            final String accountId2 = fortnite.account()
-                    .findOneByDisplayName("Ninja")
-                    .map(Account::accountId)
-                    .orElse("");
-            // accounts will be empty if the response was empty
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var accountId1String = fortnite.account()
+                .findOneByDisplayName("RobertoGraham")
+                .map(Account::accountId)
+                .orElse("");
+            final var accountId2String = fortnite.account()
+                .findOneByDisplayName("Ninja")
+                .map(Account::accountId)
+                .orElse("");
+            // accountSet will be empty if the response was empty
             // OR if every account ID was invalid
-            final Set<Account> accounts = fortnite.account()
-                    .findAllByAccountIds(accountId1, accountId2)
-                    .orElseGet(HashSet::new);
+            final var accountSet = fortnite.account()
+                .findAllByAccountIds(accountId1String, accountId2String)
+                .orElseGet(Collections::emptySet);
         } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountIds unexpected response
@@ -190,9 +181,6 @@ public class Main {
 Most basic filtering - by time windows
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
-import io.github.robertograham.fortnite2.domain.Account;
-import io.github.robertograham.fortnite2.domain.FilterableStatistic;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
@@ -200,31 +188,31 @@ import java.io.IOException;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final Account account = fortnite.account()
-                    .findOneByDisplayName("RobertoGraham")
-                    .orElseThrow(IllegalStateException::new);
-            final String accountId = account.accountId();
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var account = fortnite.account()
+                .findOneByDisplayName("RobertoGraham")
+                .orElseThrow();
+            final var accountIdString = account.accountId();
             // if any null then we received an empty response
-            final FilterableStatistic fromAccountAllTime = fortnite.statistic()
-                    .findAllByAccountForAllTime(account)
-                    .orElse(null);
-            final FilterableStatistic fromAccountIdAllTime = fortnite.statistic()
-                    .findAllByAccountIdForAllTime(accountId)
-                    .orElse(null);
-            final FilterableStatistic fromAccountCurrentSeason = fortnite.statistic()
-                    .findAllByAccountForCurrentSeason(account)
-                    .orElse(null);
-            final FilterableStatistic fromAccountIdCurrentSeason = fortnite.statistic()
-                    .findAllByAccountIdForCurrentSeason(accountId)
-                    .orElse(null);
-            FilterableStatistic fromSessionAccountIdAllTime = fortnite.statistic()
-                    .findAllBySessionAccountIdForAllTime()
-                    .orElse(null);
-            final FilterableStatistic fromSessionAccountIdCurrentSeason = fortnite.statistic()
-                    .findAllBySessionAccountIdForCurrentSeason()
-                    .orElse(null);
+            final var fromAccountAllTimeFilterableStatistic = fortnite.statistic()
+                .findAllByAccountForAllTime(account)
+                .orElse(null);
+            final var fromAccountIdAllTimeFilterableStatistic = fortnite.statistic()
+                .findAllByAccountIdForAllTime(accountIdString)
+                .orElse(null);
+            final var fromAccountCurrentSeasonFilterableStatistic = fortnite.statistic()
+                .findAllByAccountForCurrentSeason(account)
+                .orElse(null);
+            final var fromAccountIdCurrentSeasonFilterableStatistic = fortnite.statistic()
+                .findAllByAccountIdForCurrentSeason(accountIdString)
+                .orElse(null);
+            final var fromSessionAccountIdAllTimeFilterableStatistic = fortnite.statistic()
+                .findAllBySessionAccountIdForAllTime()
+                .orElse(null);
+            final var fromSessionAccountIdCurrentSeasonFilterableStatistic = fortnite.statistic()
+                .findAllBySessionAccountIdForCurrentSeason()
+                .orElse(null);
         } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
@@ -241,10 +229,6 @@ public class Main {
 Filtering by platform and then party type
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
-import io.github.robertograham.fortnite2.domain.Account;
-import io.github.robertograham.fortnite2.domain.PartyTypeFilterableStatistic;
-import io.github.robertograham.fortnite2.domain.Statistic;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
@@ -255,16 +239,16 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PC;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final Account account = fortnite.account()
-                    .findOneByDisplayName("RobertoGraham")
-                    .orElseThrow(IllegalStateException::new);
-            final PartyTypeFilterableStatistic onePlatformPartyFilterable = fortnite.statistic()
-                    .findAllByAccountForAllTime(account)
-                    .map(filterableStatistic -> filterableStatistic.byPlatform(PC))
-                    .orElseThrow(IllegalStateException::new);
-            final Statistic onePlatformOnePartyType = onePlatformPartyFilterable.byPartyType(SQUAD);
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var account = fortnite.account()
+                .findOneByDisplayName("RobertoGraham")
+                .orElseThrow();
+            final var partyTypeFilterableStatistic = fortnite.statistic()
+                .findAllByAccountForAllTime(account)
+                .map(filterableStatistic -> filterableStatistic.byPlatform(PC))
+                .orElseThrow();
+            final var statistic = partyTypeFilterableStatistic.byPartyType(SQUAD);
         } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
@@ -276,10 +260,6 @@ public class Main {
 Filtering by party type and then platform
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
-import io.github.robertograham.fortnite2.domain.Account;
-import io.github.robertograham.fortnite2.domain.PlatformFilterableStatistic;
-import io.github.robertograham.fortnite2.domain.Statistic;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
@@ -290,16 +270,16 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PS4;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final Account account = fortnite.account()
-                    .findOneByDisplayName("RobertoGraham")
-                    .orElseThrow(IllegalStateException::new);
-            final PlatformFilterableStatistic onePartyTypePlatformFilterable = fortnite.statistic()
-                    .findAllByAccountForAllTime(account)
-                    .map(filterableStatistic -> filterableStatistic.byPartyType(SOLO))
-                    .orElseThrow(IllegalStateException::new);
-            final Statistic onePartyTypeOnePlatform = onePartyTypePlatformFilterable.byPlatform(PS4);
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var account = fortnite.account()
+                .findOneByDisplayName("RobertoGraham")
+                .orElseThrow();
+            final var platformFilterableStatistic = fortnite.statistic()
+                .findAllByAccountForAllTime(account)
+                .map(filterableStatistic -> filterableStatistic.byPartyType(SOLO))
+                .orElseThrow();
+            final var statistic = platformFilterableStatistic.byPlatform(PS4);
         } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
@@ -311,9 +291,6 @@ public class Main {
 Inline platform and party type chained filter
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
-import io.github.robertograham.fortnite2.domain.Account;
-import io.github.robertograham.fortnite2.domain.Statistic;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
@@ -324,19 +301,19 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.XB1;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final Account account = fortnite.account()
-                    .findOneByDisplayName("RobertoGraham")
-                    .orElseThrow(IllegalStateException::new);
-            final Statistic statistic = fortnite.statistic()
-                    .findAllByAccountForAllTime(account)
-                    .map(filterableStatistic ->
-                            filterableStatistic
-                                    .byPlatform(XB1)
-                                    .byPartyType(DUO)
-                    )
-                    .orElse(null);
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var account = fortnite.account()
+                .findOneByDisplayName("RobertoGraham")
+                .orElseThrow();
+            final var statistic = fortnite.statistic()
+                .findAllByAccountForAllTime(account)
+                .map((final var filterableStatistic) ->
+                    filterableStatistic
+                        .byPlatform(XB1)
+                        .byPartyType(DUO)
+                )
+                .orElse(null);
         } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
@@ -350,12 +327,13 @@ means that you can make calls like `Statistic.kills()`, `Statistic.wins()`, etc.
 and narrower scoped values
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
-import io.github.robertograham.fortnite2.domain.*;
+import io.github.robertograham.fortnite2.domain.FilterableStatistic;
+import io.github.robertograham.fortnite2.domain.PartyTypeFilterableStatistic;
+import io.github.robertograham.fortnite2.domain.PlatformFilterableStatistic;
+import io.github.robertograham.fortnite2.domain.Statistic;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static io.github.robertograham.fortnite2.domain.enumeration.PartyType.SOLO;
 import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PC;
@@ -364,32 +342,32 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PS4;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            Account account = fortnite.account()
-                    .findOneByDisplayName("RobertoGraham")
-                    .orElseThrow(IllegalStateException::new);
-            final Optional<FilterableStatistic> filterableStatistic = fortnite.statistic()
-                    .findAllByAccountForAllTime(account);
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var account = fortnite.account()
+                .findOneByDisplayName("RobertoGraham")
+                .orElseThrow();
+            final var filterableStatisticOptional = fortnite.statistic()
+                .findAllByAccountForAllTime(account);
             // prints 761 at time of writing
-            filterableStatistic.map(FilterableStatistic::kills)
-                    .ifPresent(System.out::println);
+            filterableStatisticOptional.map(FilterableStatistic::kills)
+                .ifPresent(System.out::println);
             // prints 5 at time of writing
-            filterableStatistic.map(filterable -> filterable.byPlatform(PC))
-                    .map(PartyTypeFilterableStatistic::kills)
-                    .ifPresent(System.out::println);
+            filterableStatisticOptional.map((final var filterableStatistic) -> filterableStatistic.byPlatform(PC))
+                .map(PartyTypeFilterableStatistic::kills)
+                .ifPresent(System.out::println);
             // prints 580 at time of writing
-            filterableStatistic.map(filterable -> filterable.byPartyType(SOLO))
-                    .map(PlatformFilterableStatistic::kills)
-                    .ifPresent(System.out::println);
+            filterableStatisticOptional.map((final var filterableStatistic) -> filterableStatistic.byPartyType(SOLO))
+                .map(PlatformFilterableStatistic::kills)
+                .ifPresent(System.out::println);
             // prints 575 at time of writing
-            filterableStatistic.map(filterable ->
-                    filterable
-                            .byPlatform(PS4)
-                            .byPartyType(SOLO)
+            filterableStatisticOptional.map((final var filterableStatistic) ->
+                filterableStatistic
+                    .byPlatform(PS4)
+                    .byPartyType(SOLO)
             )
-                    .map(Statistic::kills)
-                    .ifPresent(System.out::println);
+                .map(Statistic::kills)
+                .ifPresent(System.out::println);
         } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR findAllByAccountForAllTime unexpected response
@@ -412,14 +390,11 @@ Name: BlossoM Tsunami, Wins: 182
 ```
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.domain.LeaderBoardEntry;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -429,32 +404,30 @@ import static io.github.robertograham.fortnite2.domain.enumeration.Platform.PC;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final List<LeaderBoardEntry> entries = fortnite.leaderBoard()
-                    .findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason(PC, SOLO, 5)
-                    .orElseThrow(IllegalStateException::new);
-            final Map<String, Account> accountIdToAccountMap = fortnite.account()
-                    .findAllByAccountIds(
-                            entries.stream()
-                                    .map(LeaderBoardEntry::accountId)
-                                    .map(accountId -> accountId.replaceAll("-", ""))
-                                    .toArray(String[]::new)
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var leaderBoardEntryList = fortnite.leaderBoard()
+                .findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason(PC, SOLO, 5)
+                .orElseThrow();
+            final var accountIdStringToAccountMap = fortnite.account()
+                .findAllByAccountIds(leaderBoardEntryList.stream()
+                    .map(LeaderBoardEntry::accountId)
+                    .map((final var accountIdString) -> accountIdString.replaceAll("-", ""))
+                    .toArray(String[]::new))
+                .map((final var accountSet) ->
+                    accountSet.stream()
+                        .collect(Collectors.toMap(Account::accountId, Function.identity()))
+                )
+                .orElseThrow();
+            leaderBoardEntryList.stream()
+                .map((final var leaderBoardEntry) ->
+                    String.format(
+                        "Name: %s, Wins: %d",
+                        accountIdStringToAccountMap.get(leaderBoardEntry.accountId().replaceAll("-", "")).displayName(),
+                        leaderBoardEntry.value()
                     )
-                    .map(accounts ->
-                            accounts.stream()
-                                    .collect(Collectors.toMap(Account::accountId, Function.identity()))
-                    )
-                    .orElseThrow(IllegalStateException::new);
-            entries.stream()
-                    .map(leaderBoardEntry ->
-                            String.format(
-                                    "Name: %s, Wins: %d",
-                                    accountIdToAccountMap.get(leaderBoardEntry.accountId().replaceAll("-", "")).displayName(),
-                                    leaderBoardEntry.value()
-                            )
-                    )
-                    .forEach(System.out::println);
+                )
+                .forEach(System.out::println);
         } catch (final IOException exception) {
             // findHighestWinnersByPlatformAndByPartyTypeForCurrentSeason unexpected response
             // OR findAllByAccountIds unexpected response
@@ -468,7 +441,6 @@ public class Main {
 Fetch both accepted and pending friend requests for the authenticated user
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
@@ -476,8 +448,8 @@ import java.io.IOException;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
             fortnite.friend()
                 .findAllRequestsBySessionAccountId()
                 .ifPresent(System.out::println);
@@ -491,7 +463,6 @@ public class Main {
 Fetch only accepted friend requests for the authenticated user
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
@@ -499,8 +470,8 @@ import java.io.IOException;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
             fortnite.friend()
                 .findAllNonPendingRequestsBySessionAccountId()
                 .ifPresent(System.out::println);
@@ -514,8 +485,6 @@ public class Main {
 Delete a friend or a friend request using an account or an account ID
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
-import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
@@ -523,16 +492,16 @@ import java.io.IOException;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final Account account = fortnite.account()
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var account = fortnite.account()
                 .findOneByDisplayName("RobertoGraham")
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow();
             fortnite.friend()
                 .deleteOneByAccount(account);
             fortnite.friend()
                 .deleteOneByAccountId(account.accountId());
-        } catch (final IOException e) {
+        } catch (final IOException exception) {
             // findOneByDisplayName unexpected response
             // OR deleteOneByAccount unexpected response
             // OR deleteOneByAccountId unexpected response
@@ -544,8 +513,6 @@ public class Main {
 Add a friend or accept a friend request using an account or an account ID
 
 ```java
-import io.github.robertograham.fortnite2.client.Fortnite;
-import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
 
 import java.io.IOException;
@@ -553,11 +520,11 @@ import java.io.IOException;
 public class Main {
 
     public static void main(final String[] args) {
-        final Builder builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
-        try (final Fortnite fortnite = builder.build()) {
-            final Account account = fortnite.account()
+        final var builder = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword");
+        try (final var fortnite = builder.build()) {
+            final var account = fortnite.account()
                 .findOneByDisplayName("RobertoGraham")
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow();
             fortnite.friend()
                 .addOneByAccount(account);
             fortnite.friend()
