@@ -53,7 +53,7 @@ final class RawStatistic {
             return true;
         if (!(object instanceof RawStatistic))
             return false;
-        final RawStatistic rawStatistic = (RawStatistic) object;
+        final var rawStatistic = (RawStatistic) object;
         return value == rawStatistic.value &&
             type.equals(rawStatistic.type) &&
             platform.equals(rawStatistic.platform) &&
@@ -76,13 +76,14 @@ final class RawStatistic {
 
         @Override
         public RawStatistic adaptFromJson(final JsonObject jsonObject) {
-            final String[] nameParts = jsonObject.getString("name")
+            final var namePartsStringArray = jsonObject.getString("name")
                 .split("_");
             return new RawStatistic(
-                nameParts[1],
-                nameParts[2],
-                nameParts[4],
-                jsonObject.getJsonNumber("value").longValueExact()
+                namePartsStringArray[1],
+                namePartsStringArray[2],
+                namePartsStringArray[4],
+                jsonObject.getJsonNumber("value")
+                    .longValueExact()
             );
         }
     }

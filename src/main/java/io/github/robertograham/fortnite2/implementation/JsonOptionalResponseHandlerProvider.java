@@ -3,7 +3,6 @@ package io.github.robertograham.fortnite2.implementation;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.util.EntityUtils;
@@ -13,7 +12,6 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -34,7 +32,7 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
 
     JsonOptionalResponseHandlerProvider(final JsonbAdapter... jsonbAdapters) {
         stringOptionalHandler = responseHandlerFromHttpEntityToOptionalResultMapper(
-            httpEntity -> Optional.ofNullable(EntityUtils.toString(httpEntity))
+            (final var httpEntity) -> Optional.ofNullable(EntityUtils.toString(httpEntity))
         );
         jsonb = JsonbBuilder.create(new JsonbConfig()
             .withAdapters(jsonbAdapters));
@@ -48,12 +46,10 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
     @Override
     public <T> ResponseHandler<Optional<T>> forClass(final Class<T> tClass) {
         return responseHandlerFromHttpEntityToOptionalResultMapper(
-            httpEntity -> {
-                try (final InputStream inputStream = httpEntity.getContent()) {
+            (final var httpEntity) -> {
+                try (final var inputStream = httpEntity.getContent()) {
                     return Optional.ofNullable(inputStream)
-                        .map(nonNullInputStream ->
-                            jsonb.fromJson(nonNullInputStream, tClass)
-                        );
+                        .map(nonNullInputStream -> jsonb.fromJson(nonNullInputStream, tClass));
                 }
             }
         );
@@ -63,10 +59,10 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
         final HttpEntityToOptionalResultMapper<T> httpEntityToOptionalResultMapper
     ) {
         return response -> {
-            final StatusLine statusLine = response.getStatusLine();
-            final int statusCode = statusLine.getStatusCode();
-            final HttpEntity httpEntity = response.getEntity();
-            if (statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_MULTIPLE_CHOICES)
+            final var statusLine = response.getStatusLine();
+            final var statusCodeInt = statusLine.getStatusCode();
+            final var httpEntity = response.getEntity();
+            if (statusCodeInt >= HttpStatus.SC_OK && statusCodeInt < HttpStatus.SC_MULTIPLE_CHOICES)
                 return httpEntity == null ?
                     Optional.empty()
                     : httpEntityToOptionalResultMapper.mapHttpEntityToOptionalResult(httpEntity);
@@ -77,10 +73,10 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
                     "[%d] %s",
                     statusLine.getStatusCode(),
                     Arrays.stream(response.getAllHeaders())
-                        .filter(header -> "X-Epic-Error-Name".equals(header.getName()))
+                        .filter((final var header) -> "X-Epic-Error-Name".equals(header.getName()))
                         .findFirst()
                         .map(Header::getValue)
-                        .filter(epicErrorName -> !epicErrorName.trim().isEmpty())
+                        .filter(epicErrorName -> !epicErrorName.isBlank())
                         .orElseGet(statusLine::getReasonPhrase)
                 )
             );

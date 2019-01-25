@@ -31,7 +31,7 @@ final class Cohort {
             return true;
         if (!(object instanceof Cohort))
             return false;
-        final Cohort cohort = (Cohort) object;
+        final var cohort = (Cohort) object;
         return cohortAccounts.equals(cohort.cohortAccounts);
     }
 

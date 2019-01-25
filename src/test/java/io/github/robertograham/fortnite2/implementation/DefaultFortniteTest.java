@@ -11,28 +11,28 @@ class DefaultFortniteTest {
     @DisplayName("DefaultFortnite.Builder throws NPEs")
     void defaultFortniteBuilderThrowsNPE() {
         assertThrows(
-                NullPointerException.class,
-                () -> DefaultFortnite.Builder.newInstance(null, ""),
-                "epicGamesEmailAddress cannot be null"
+            NullPointerException.class,
+            () -> DefaultFortnite.Builder.newInstance(null, ""),
+            "epicGamesEmailAddress cannot be null"
         );
         assertThrows(
-                NullPointerException.class,
-                () -> DefaultFortnite.Builder.newInstance("", null),
-                "epicGamesPassword cannot be null"
+            NullPointerException.class,
+            () -> DefaultFortnite.Builder.newInstance("", null),
+            "epicGamesPassword cannot be null"
         );
         assertThrows(
-                NullPointerException.class,
-                () ->
-                        DefaultFortnite.Builder.newInstance("", "")
-                                .setEpicGamesLauncherToken(null),
-                "epicGamesLauncherToken cannot be null"
+            NullPointerException.class,
+            () ->
+                DefaultFortnite.Builder.newInstance("", "")
+                    .setEpicGamesLauncherToken(null),
+            "epicGamesLauncherToken cannot be null"
         );
         assertThrows(
-                NullPointerException.class,
-                () ->
-                        DefaultFortnite.Builder.newInstance("", "")
-                                .setFortniteClientToken(null),
-                "fortniteClientToken cannot be null"
+            NullPointerException.class,
+            () ->
+                DefaultFortnite.Builder.newInstance("", "")
+                    .setFortniteClientToken(null),
+            "fortniteClientToken cannot be null"
         );
     }
 }

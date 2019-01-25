@@ -93,10 +93,8 @@ final class DefaultLeaderBoardResource implements LeaderBoardResource {
             .map(RawLeaderBoard::leaderBoardEntries)
             .map(leaderBoardEntries ->
                 leaderBoardEntries.stream()
-                    .sorted(
-                        Comparator.comparingLong(LeaderBoardEntry::value)
-                            .reversed()
-                    )
+                    .sorted(Comparator.comparingLong(LeaderBoardEntry::value)
+                        .reversed())
                     .collect(Collectors.toList())
             );
     }

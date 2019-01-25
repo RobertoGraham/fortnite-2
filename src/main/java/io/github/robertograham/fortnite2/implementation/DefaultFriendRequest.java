@@ -71,7 +71,7 @@ final class DefaultFriendRequest implements FriendRequest {
             return true;
         if (!(object instanceof DefaultFriendRequest))
             return false;
-        final DefaultFriendRequest defaultFriendRequest = (DefaultFriendRequest) object;
+        final var defaultFriendRequest = (DefaultFriendRequest) object;
         return favourite == defaultFriendRequest.favourite &&
             accountId.equals(defaultFriendRequest.accountId) &&
             status.equals(defaultFriendRequest.status) &&

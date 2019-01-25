@@ -72,7 +72,7 @@ final class Token {
             return true;
         if (!(object instanceof Token))
             return false;
-        final Token token = (Token) object;
+        final var token = (Token) object;
         return accessToken.equals(token.accessToken) &&
             expiresAt.equals(token.expiresAt) &&
             refreshToken.equals(token.refreshToken) &&

@@ -32,7 +32,7 @@ final class RawLeaderBoard {
             return true;
         if (!(object instanceof RawLeaderBoard))
             return false;
-        final RawLeaderBoard rawLeaderBoard = (RawLeaderBoard) object;
+        final var rawLeaderBoard = (RawLeaderBoard) object;
         return leaderBoardEntries.equals(rawLeaderBoard.leaderBoardEntries);
     }
 
@@ -54,8 +54,8 @@ final class RawLeaderBoard {
         public RawLeaderBoard adaptFromJson(final JsonObject jsonObject) {
             return new RawLeaderBoard(
                 jsonObject.getJsonArray("entries")
-                    .getValuesAs(jsonValue -> {
-                        final JsonObject leaderBoardEntryJsonObject = jsonValue.asJsonObject();
+                    .getValuesAs((final var jsonValue) -> {
+                        final var leaderBoardEntryJsonObject = jsonValue.asJsonObject();
                         return new DefaultLeaderBoardEntry(
                             leaderBoardEntryJsonObject.getString("accountId"),
                             leaderBoardEntryJsonObject.getJsonNumber("value")

@@ -6,7 +6,6 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,7 +54,7 @@ final class DefaultFriendResource implements FriendResource {
                 .build(),
             optionalResponseHandlerProvider.forClass(DefaultFriendRequest[].class)
         )
-            .map(Arrays::asList);
+            .map(List::of);
     }
 
     @Override

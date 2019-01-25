@@ -64,7 +64,7 @@ abstract class ForwardingStatistic implements Statistic {
     }
 
     @Override
-    public LocalDateTime timeLastModified() {
+    public final LocalDateTime timeLastModified() {
         return statistic.timeLastModified();
     }
 
@@ -81,7 +81,7 @@ abstract class ForwardingStatistic implements Statistic {
             return true;
         if (!(object instanceof ForwardingStatistic))
             return false;
-        final ForwardingStatistic forwardingStatistic = (ForwardingStatistic) object;
+        final var forwardingStatistic = (ForwardingStatistic) object;
         return statistic.equals(forwardingStatistic.statistic);
     }
 

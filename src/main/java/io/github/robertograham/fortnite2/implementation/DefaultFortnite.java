@@ -69,18 +69,18 @@ public final class DefaultFortnite implements Fortnite {
     }
 
     private Token fetchSessionToken() throws IOException {
-        final String accessToken = authenticationResource.passwordGrantedToken(
+        final var accessTokenString = authenticationResource.passwordGrantedToken(
             epicGamesEmailAddress,
             epicGamesPassword,
             epicGamesLauncherToken
         )
             .map(Token::accessToken)
             .orElseThrow(() -> new IOException("Couldn't retrieve an access token"));
-        final String exchangeCode = authenticationResource.accessTokenGrantedExchange(accessToken)
+        final var exchangeCodeString = authenticationResource.accessTokenGrantedExchange(accessTokenString)
             .map(Exchange::code)
             .orElseThrow(() -> new IOException("Couldn't retrieve an exchange code"));
         return authenticationResource.exchangeCodeGrantedToken(
-            exchangeCode,
+            exchangeCodeString,
             fortniteClientToken
         )
             .orElseThrow(() -> new IOException("Couldn't establish a session"));
@@ -89,9 +89,8 @@ public final class DefaultFortnite implements Fortnite {
     private Token nonExpiredSessionToken() {
         if (sessionToken.refreshExpiresAt()
             .minusMinutes(5L)
-            .isBefore(now())) {
+            .isBefore(now()))
             establishNewSession();
-        }
         if (sessionToken.expiresAt()
             .minusMinutes(5L)
             .isBefore(now()))
@@ -101,9 +100,9 @@ public final class DefaultFortnite implements Fortnite {
 
     private void establishNewSession() {
         try {
-            final String oldAccessToken = sessionToken.accessToken();
+            final var oldAccessTokenString = sessionToken.accessToken();
             sessionToken = fetchSessionToken();
-            authenticationResource.retireAccessToken(oldAccessToken);
+            authenticationResource.retireAccessToken(oldAccessTokenString);
         } catch (final IOException exception) {
             exception.printStackTrace();
         }
@@ -111,13 +110,13 @@ public final class DefaultFortnite implements Fortnite {
 
     private void refreshSession() {
         try {
-            final String oldAccessToken = sessionToken.accessToken();
+            final var oldAccessTokenString = sessionToken.accessToken();
             sessionToken = authenticationResource.refreshTokenGrantedToken(
                 sessionToken.refreshToken(),
                 fortniteClientToken
             )
                 .orElseThrow(() -> new IOException("Couldn't refresh session"));
-            authenticationResource.retireAccessToken(oldAccessToken);
+            authenticationResource.retireAccessToken(oldAccessTokenString);
         } catch (final IOException exception) {
             exception.printStackTrace();
         }

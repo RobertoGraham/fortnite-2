@@ -39,7 +39,7 @@ final class DefaultLeaderBoardEntry implements LeaderBoardEntry {
             return true;
         if (!(object instanceof DefaultLeaderBoardEntry))
             return false;
-        final DefaultLeaderBoardEntry defaultLeaderBoardEntry = (DefaultLeaderBoardEntry) object;
+        final var defaultLeaderBoardEntry = (DefaultLeaderBoardEntry) object;
         return value == defaultLeaderBoardEntry.value &&
             accountId.equals(defaultLeaderBoardEntry.accountId);
     }

@@ -29,7 +29,7 @@ final class Exchange {
             return true;
         if (!(object instanceof Exchange))
             return false;
-        final Exchange exchange = (Exchange) object;
+        final var exchange = (Exchange) object;
         return Objects.equals(code, exchange.code);
     }
 

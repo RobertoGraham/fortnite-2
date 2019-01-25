@@ -14,11 +14,11 @@ import java.util.function.Predicate;
 final class DefaultFilterableStatistic extends StatisticFilterer implements FilterableStatistic {
 
     private static final Function<Platform, Predicate<RawStatistic>> RAW_STATISTIC_PREDICATE_FACTORY_PLATFORM =
-        platform ->
-            rawStatistic -> platform.code().equals(rawStatistic.platform());
+        (final var platform) ->
+            (final var rawStatistic) -> platform.code().equals(rawStatistic.platform());
     private static final Function<PartyType, Predicate<RawStatistic>> RAW_STATISTIC_PREDICATE_FACTORY_PARTY_TYPE =
-        partyType ->
-            rawStatistic -> partyType.code().equals(rawStatistic.partyType());
+        (final var partyType) ->
+            (final var rawStatistic) -> partyType.code().equals(rawStatistic.partyType());
 
     DefaultFilterableStatistic(final Set<RawStatistic> rawStatistics) {
         super(rawStatistics);

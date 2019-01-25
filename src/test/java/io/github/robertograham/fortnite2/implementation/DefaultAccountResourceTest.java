@@ -45,10 +45,10 @@ class DefaultAccountResourceTest {
         mockAccessTokenSupplier = mock(StringSupplier.class);
         mockSessionAccountIdSupplier = mock(StringSupplier.class);
         accountResource = DefaultAccountResource.newInstance(
-                mockHttpClient,
-                mockOptionalResponseHandlerProvider,
-                mockAccessTokenSupplier,
-                mockSessionAccountIdSupplier
+            mockHttpClient,
+            mockOptionalResponseHandlerProvider,
+            mockAccessTokenSupplier,
+            mockSessionAccountIdSupplier
         );
     }
 
@@ -56,66 +56,66 @@ class DefaultAccountResourceTest {
     @DisplayName("findOneByDisplayName throws NPE")
     void findOneByDisplayNameThrowsNPE() {
         assertThrows(
-                NullPointerException.class,
-                () -> accountResource.findOneByDisplayName(null),
-                "displayName cannot be null"
+            NullPointerException.class,
+            () -> accountResource.findOneByDisplayName(null),
+            "displayName cannot be null"
         );
     }
 
     @Test
     @DisplayName("findOneByDisplayName executes correct request")
     void findOneByDisplayNameUsesCorrectRequest() throws IOException {
-        final ResponseHandler<Optional<DefaultAccount>> responseHandler = response -> Optional.empty();
+        final var defaultAccountOptionalResponseHandler = (ResponseHandler<Optional<DefaultAccount>>) response -> Optional.empty();
         when(mockOptionalResponseHandlerProvider.forClass(DefaultAccount.class))
-                .thenReturn(responseHandler);
+            .thenReturn(defaultAccountOptionalResponseHandler);
         when(mockHttpClient.execute(any(HttpUriRequest.class), any(ResponseHandler.class)))
-                .thenReturn(responseHandler.handleResponse(null));
+            .thenReturn(defaultAccountOptionalResponseHandler.handleResponse(null));
         when(mockAccessTokenSupplier.get())
-                .thenReturn("accessToken");
+            .thenReturn("accessToken");
         accountResource.findOneByDisplayName("displayName");
         verify(mockHttpClient, times(1))
-                .execute(requestArgumentCaptor.capture(), defaultAccountOptionalResponseHandlerArgumentCaptor.capture());
-        assertEquals(responseHandler, defaultAccountOptionalResponseHandlerArgumentCaptor.getValue());
-        final HttpUriRequest actualRequest = requestArgumentCaptor.getValue();
-        assertEquals(HttpGet.METHOD_NAME, actualRequest.getMethod());
+            .execute(requestArgumentCaptor.capture(), defaultAccountOptionalResponseHandlerArgumentCaptor.capture());
+        assertEquals(defaultAccountOptionalResponseHandler, defaultAccountOptionalResponseHandlerArgumentCaptor.getValue());
+        final var actualHttpUriRequest = requestArgumentCaptor.getValue();
+        assertEquals(HttpGet.METHOD_NAME, actualHttpUriRequest.getMethod());
         assertEquals(
-                URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account/displayName/displayName"),
-                actualRequest.getURI()
+            URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account/displayName/displayName"),
+            actualHttpUriRequest.getURI()
         );
-        assertTrue(Arrays.stream(actualRequest.getAllHeaders())
-                .anyMatch(header ->
-                        AUTHORIZATION.equals(header.getName())
-                                && "bearer accessToken".equals(header.getValue())
-                ));
+        assertTrue(Arrays.stream(actualHttpUriRequest.getAllHeaders())
+            .anyMatch((final var header) ->
+                AUTHORIZATION.equals(header.getName())
+                    && "bearer accessToken".equals(header.getValue())
+            ));
     }
 
     @Test
     @DisplayName("findOneBySessionAccountId executes correct request")
     void findOneBySessionAccountIdUsesCorrectRequest() throws IOException {
-        final ResponseHandler<Optional<DefaultAccount[]>> responseHandler = response -> Optional.empty();
+        final var defaultAccountArrayOptionalResponseHandler = (ResponseHandler<Optional<DefaultAccount[]>>) response -> Optional.empty();
         when(mockOptionalResponseHandlerProvider.forClass(DefaultAccount[].class))
-                .thenReturn(responseHandler);
+            .thenReturn(defaultAccountArrayOptionalResponseHandler);
         when(mockHttpClient.execute(any(HttpUriRequest.class), any(ResponseHandler.class)))
-                .thenReturn(responseHandler.handleResponse(null));
+            .thenReturn(defaultAccountArrayOptionalResponseHandler.handleResponse(null));
         when(mockAccessTokenSupplier.get())
-                .thenReturn("accessToken");
+            .thenReturn("accessToken");
         when(mockSessionAccountIdSupplier.get())
-                .thenReturn("accountId");
+            .thenReturn("accountId");
         accountResource.findOneBySessionAccountId();
         verify(mockHttpClient, times(1))
-                .execute(requestArgumentCaptor.capture(), defaultAccountOptionalArrayResponseHandlerArgumentCaptor.capture());
-        assertEquals(responseHandler, defaultAccountOptionalArrayResponseHandlerArgumentCaptor.getValue());
-        final HttpUriRequest actualRequest = requestArgumentCaptor.getValue();
-        assertEquals(HttpGet.METHOD_NAME, actualRequest.getMethod());
+            .execute(requestArgumentCaptor.capture(), defaultAccountOptionalArrayResponseHandlerArgumentCaptor.capture());
+        assertEquals(defaultAccountArrayOptionalResponseHandler, defaultAccountOptionalArrayResponseHandlerArgumentCaptor.getValue());
+        final var actualHttpUriRequest = requestArgumentCaptor.getValue();
+        assertEquals(HttpGet.METHOD_NAME, actualHttpUriRequest.getMethod());
         assertEquals(
-                URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account?accountId=accountId"),
-                actualRequest.getURI()
+            URI.create("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account?accountId=accountId"),
+            actualHttpUriRequest.getURI()
         );
-        assertTrue(Arrays.stream(actualRequest.getAllHeaders())
-                .anyMatch(header ->
-                        AUTHORIZATION.equals(header.getName())
-                                && "bearer accessToken".equals(header.getValue())
-                ));
+        assertTrue(Arrays.stream(actualHttpUriRequest.getAllHeaders())
+            .anyMatch((final var header) ->
+                AUTHORIZATION.equals(header.getName())
+                    && "bearer accessToken".equals(header.getValue())
+            ));
     }
 
     private interface StringSupplier extends Supplier<String> {

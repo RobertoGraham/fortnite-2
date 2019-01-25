@@ -70,11 +70,8 @@ public interface Statistic {
     long timesPlacedTop6();
 
     /**
-     * @return time this statistic was last updated. {@link LocalDateTime}.MIN
-     * by default.
+     * @return time this statistic was last updated
      * @since 1.1.0
      */
-    default LocalDateTime timeLastModified() {
-        return LocalDateTime.MIN;
-    }
+    LocalDateTime timeLastModified();
 }

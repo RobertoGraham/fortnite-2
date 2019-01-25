@@ -33,9 +33,7 @@ public interface AccountResource {
      *                     API response
      * @since 1.2.0
      */
-    default Optional<Account> findOneBySessionAccountId() throws IOException {
-        return Optional.empty();
-    }
+    Optional<Account> findOneBySessionAccountId() throws IOException;
 
     /**
      * @param accountIds IDs of the Epic Games accounts to be retrieved

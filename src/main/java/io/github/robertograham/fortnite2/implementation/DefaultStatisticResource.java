@@ -6,10 +6,9 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
@@ -56,7 +55,7 @@ final class DefaultStatisticResource implements StatisticResource {
                 .build(),
             optionalResponseHandlerProvider.forClass(RawStatistic[].class)
         )
-            .map(rawStatistics -> new HashSet<>(Arrays.asList(rawStatistics)))
+            .map(Set::of)
             .map(DefaultFilterableStatistic::new);
     }
 

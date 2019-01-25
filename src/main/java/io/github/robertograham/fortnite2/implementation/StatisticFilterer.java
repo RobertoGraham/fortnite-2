@@ -41,7 +41,7 @@ abstract class StatisticFilterer extends ForwardingStatistic {
             return false;
         if (!super.equals(object))
             return false;
-        final StatisticFilterer statisticFilterer = (StatisticFilterer) object;
+        final var statisticFilterer = (StatisticFilterer) object;
         return rawStatistics.equals(statisticFilterer.rawStatistics);
     }
 

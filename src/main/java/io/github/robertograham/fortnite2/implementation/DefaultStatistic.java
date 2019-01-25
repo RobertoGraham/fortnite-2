@@ -29,7 +29,7 @@ final class DefaultStatistic implements Statistic {
     DefaultStatistic(final Set<RawStatistic> rawStatistics) {
         final Map<String, Long> summedValuesGroupedByStatType =
             rawStatistics.stream()
-                .filter(rawStatistic -> !"lastmodified".equals(rawStatistic.type()))
+                .filter((final var rawStatistic) -> !"lastmodified".equals(rawStatistic.type()))
                 .collect(Collectors.groupingBy(
                     RawStatistic::type,
                     Collectors.summingLong(RawStatistic::value)
@@ -47,7 +47,7 @@ final class DefaultStatistic implements Statistic {
         timeLastModified = rawStatistics.stream()
             .filter(rawStatistic -> "lastmodified".equals(rawStatistic.type()))
             .max(Comparator.comparingLong(RawStatistic::value))
-            .map(rawStatistic ->
+            .map((final var rawStatistic) ->
                 LocalDateTime.ofInstant(
                     Instant.ofEpochSecond(rawStatistic.value()),
                     ZoneOffset.UTC
@@ -134,7 +134,7 @@ final class DefaultStatistic implements Statistic {
             return true;
         if (!(object instanceof DefaultStatistic))
             return false;
-        final DefaultStatistic defaultStatistic = (DefaultStatistic) object;
+        final var defaultStatistic = (DefaultStatistic) object;
         return wins == defaultStatistic.wins &&
             matches == defaultStatistic.matches &&
             kills == defaultStatistic.kills &&

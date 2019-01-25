@@ -64,8 +64,8 @@ final class DefaultAccountResource implements AccountResource {
     @Override
     public Optional<Account> findOneBySessionAccountId() throws IOException {
         return findAllByAccountIds(sessionAccountIdSupplier.get())
-            .flatMap(accounts ->
-                accounts.stream()
+            .flatMap((final var accountSet) ->
+                accountSet.stream()
                     .findFirst()
             );
     }
@@ -76,28 +76,27 @@ final class DefaultAccountResource implements AccountResource {
         if (Arrays.stream(accountIds)
             .anyMatch(Objects::isNull))
             throw new NullPointerException("accountIds cannot contain null value");
-        final Set<Set<String>> accountIdsPartitioned = IntStream.range(0, accountIds.length)
+        final var accountIdPartitionSetSet = IntStream.range(0, accountIds.length)
             .boxed()
-            .collect(
-                Collectors.groupingBy(index ->
-                    index / MAX_ID_COUNT_PER_ACCOUNTS_REQUEST
-                )
-            )
+            .collect(Collectors.groupingBy((final var integer) ->
+                integer / MAX_ID_COUNT_PER_ACCOUNTS_REQUEST
+            ))
             .values()
             .stream()
-            .map(indices ->
-                indices.stream()
-                    .map(index -> accountIds[index])
+            .map((final var integerList) ->
+                integerList.stream()
+                    .map((final var integer) -> accountIds[integer])
                     .collect(Collectors.toSet())
             )
             .collect(Collectors.toSet());
-        final Set<Optional<Set<Account>>> optionalAccountSetSet = new HashSet<>();
-        for (final Set<String> accountIdPartition : accountIdsPartitioned)
-            optionalAccountSetSet.add(findAllByAccountIds(accountIdPartition));
+        final var optionalAccountSetSet = new HashSet<Optional<Set<Account>>>();
+        for (final var accountIdPartitionSet : accountIdPartitionSetSet)
+            optionalAccountSetSet.add(findAllByAccountIds(accountIdPartitionSet));
         return optionalAccountSetSet.stream()
-            .reduce((optionalAccountSetToAdd, optionalAccountSetAccumulator) ->
-                optionalAccountSetAccumulator.map(accountSet -> {
-                    accountSet.addAll(optionalAccountSetToAdd.orElseGet(HashSet::new));
+            .reduce((final var optionalAccountSet,
+                     final var optionalAccountSetAccumulator) ->
+                optionalAccountSetAccumulator.map((final var accountSet) -> {
+                    accountSet.addAll(optionalAccountSet.orElseGet(HashSet::new));
                     return accountSet;
                 })
             )
@@ -108,12 +107,12 @@ final class DefaultAccountResource implements AccountResource {
         return httpClient.execute(
             RequestBuilder.get("https://account-public-service-prod03.ol.epicgames.com/account/api/public/account")
                 .addParameters(accountIds.stream()
-                    .map(accountId -> new BasicNameValuePair("accountId", accountId))
+                    .map((final var accountIdString) -> new BasicNameValuePair("accountId", accountIdString))
                     .toArray(BasicNameValuePair[]::new))
                 .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
                 .build(),
             optionalResponseHandlerProvider.forClass(DefaultAccount[].class)
         )
-            .map(accounts -> new HashSet<>(Arrays.asList(accounts)));
+            .map(Set::of);
     }
 }

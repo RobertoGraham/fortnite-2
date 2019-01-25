@@ -50,9 +50,7 @@ public interface StatisticResource {
      *                     API response
      * @since 1.2.0
      */
-    default Optional<FilterableStatistic> findAllBySessionAccountIdForAllTime() throws IOException {
-        return Optional.empty();
-    }
+    Optional<FilterableStatistic> findAllBySessionAccountIdForAllTime() throws IOException;
 
     /**
      * @param accountId ID of the Epic Games account to fetch current season
@@ -90,7 +88,5 @@ public interface StatisticResource {
      *                     API response
      * @since 1.2.0
      */
-    default Optional<FilterableStatistic> findAllBySessionAccountIdForCurrentSeason() throws IOException {
-        return Optional.empty();
-    }
+    Optional<FilterableStatistic> findAllBySessionAccountIdForCurrentSeason() throws IOException;
 }

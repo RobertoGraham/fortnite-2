@@ -41,7 +41,7 @@ final class DefaultAccount implements Account {
             return true;
         if (!(object instanceof DefaultAccount))
             return false;
-        final DefaultAccount defaultAccount = (DefaultAccount) object;
+        final var defaultAccount = (DefaultAccount) object;
         return Objects.equals(accountId, defaultAccount.accountId) &&
             Objects.equals(displayName, defaultAccount.displayName);
     }
