@@ -3,10 +3,12 @@ package io.github.robertograham.fortnite2.implementation;
 import io.github.robertograham.fortnite2.domain.Account;
 import io.github.robertograham.fortnite2.resource.AccountResource;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -48,17 +50,25 @@ final class DefaultAccountResource implements AccountResource {
     @Override
     public Optional<Account> findOneByDisplayName(final String displayName) throws IOException {
         Objects.requireNonNull(displayName, "displayName cannot be null");
-        return httpClient.execute(
-            RequestBuilder.get(String.format(
-                "%s/%s",
-                "https://account-public-service-prod03.ol.epicgames.com/account/api/public/account/displayName",
-                displayName
-            ))
-                .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
-                .build(),
-            optionalResponseHandlerProvider.forClass(DefaultAccount.class)
-        )
-            .map(Function.identity());
+        try {
+            return httpClient.execute(
+                RequestBuilder.get(new URIBuilder()
+                    .setScheme("https")
+                    .setHost("account-public-service-prod03.ol.epicgames.com")
+                    .setPath(String.format(
+                        "/%s/%s",
+                        "account/api/public/account/displayName",
+                        displayName
+                    ))
+                    .build())
+                    .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
+                    .build(),
+                optionalResponseHandlerProvider.forClass(DefaultAccount.class)
+            )
+                .map(Function.identity());
+        } catch (final URISyntaxException exception) {
+            throw new IOException("Bad URI", exception);
+        }
     }
 
     @Override
