@@ -1,6 +1,7 @@
 package io.github.robertograham.fortnite2.implementation;
 
 import io.github.robertograham.fortnite2.client.Fortnite;
+import io.github.robertograham.fortnite2.domain.Token;
 import io.github.robertograham.fortnite2.resource.AccountResource;
 import io.github.robertograham.fortnite2.resource.FriendResource;
 import io.github.robertograham.fortnite2.resource.LeaderBoardResource;
@@ -10,9 +11,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Objects;
-
-import static java.time.LocalDateTime.now;
 
 /**
  * Default implementation of {@link Fortnite} created using {@link Builder}
@@ -45,26 +45,26 @@ public final class DefaultFortnite implements Fortnite {
         accountResource = DefaultAccountResource.newInstance(
             httpClient,
             JsonOptionalResponseHandlerProvider.INSTANCE,
-            () -> nonExpiredSessionToken().accessToken(),
-            () -> nonExpiredSessionToken().accountId()
+            () -> session().accessToken(),
+            () -> session().accountId()
         );
         leaderBoardResource = DefaultLeaderBoardResource.newInstance(
             httpClient,
             JsonOptionalResponseHandlerProvider.INSTANCE,
-            () -> nonExpiredSessionToken().accessToken(),
-            () -> nonExpiredSessionToken().inAppId()
+            () -> session().accessToken(),
+            () -> session().inAppId()
         );
         statisticResource = DefaultStatisticResource.newInstance(
             httpClient,
             JsonOptionalResponseHandlerProvider.INSTANCE,
-            () -> nonExpiredSessionToken().accessToken(),
-            () -> nonExpiredSessionToken().accountId()
+            () -> session().accessToken(),
+            () -> session().accountId()
         );
         friendResource = DefaultFriendResource.newInstance(
             httpClient,
             JsonOptionalResponseHandlerProvider.INSTANCE,
-            () -> nonExpiredSessionToken().accessToken(),
-            () -> nonExpiredSessionToken().accountId()
+            () -> session().accessToken(),
+            () -> session().accountId()
         );
     }
 
@@ -84,18 +84,6 @@ public final class DefaultFortnite implements Fortnite {
             fortniteClientToken
         )
             .orElseThrow(() -> new IOException("Couldn't establish a session"));
-    }
-
-    private Token nonExpiredSessionToken() {
-        if (sessionToken.refreshExpiresAt()
-            .minusMinutes(5L)
-            .isBefore(now()))
-            establishNewSession();
-        if (sessionToken.expiresAt()
-            .minusMinutes(5L)
-            .isBefore(now()))
-            refreshSession();
-        return sessionToken;
     }
 
     private void establishNewSession() {
@@ -143,10 +131,22 @@ public final class DefaultFortnite implements Fortnite {
     }
 
     @Override
+    public Token session() {
+        if (sessionToken.refreshTokenExpiryTime()
+            .minusMinutes(5L)
+            .isBefore(LocalDateTime.now()))
+            establishNewSession();
+        if (sessionToken.accessTokenExpiryTime()
+            .minusMinutes(5L)
+            .isBefore(LocalDateTime.now()))
+            refreshSession();
+        return sessionToken;
+    }
+
+    @Override
     public void close() {
-        // TODO log exceptions
         try {
-            authenticationResource.retireAccessToken(nonExpiredSessionToken().accessToken());
+            authenticationResource.retireAccessToken(session().accessToken());
         } catch (final IOException exception) {
             exception.printStackTrace();
         }

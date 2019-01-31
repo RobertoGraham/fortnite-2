@@ -1,5 +1,6 @@
 package io.github.robertograham.fortnite2.implementation;
 
+import io.github.robertograham.fortnite2.domain.Token;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.EntityBuilder;
 import org.apache.http.client.methods.RequestBuilder;
@@ -8,6 +9,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
@@ -45,8 +47,9 @@ final class AuthenticationResource {
                     .setParameters(formParameters)
                     .build())
                 .build(),
-            optionalResponseHandlerProvider.forClass(Token.class)
-        );
+            optionalResponseHandlerProvider.forClass(DefaultToken.class)
+        )
+            .map(Function.identity());
     }
 
     Optional<Token> passwordGrantedToken(final String epicGamesEmailAddress,

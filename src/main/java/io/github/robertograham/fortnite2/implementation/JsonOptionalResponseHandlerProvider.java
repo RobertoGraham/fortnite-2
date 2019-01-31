@@ -18,7 +18,7 @@ import java.util.Optional;
 enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvider {
 
     INSTANCE(
-        Token.Adapter.INSTANCE,
+        DefaultToken.Adapter.INSTANCE,
         Exchange.Adapter.INSTANCE,
         DefaultAccount.Adapter.INSTANCE,
         RawStatistic.Adapter.INSTANCE,
