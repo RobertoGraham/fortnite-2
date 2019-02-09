@@ -23,6 +23,7 @@ public final class DefaultFortnite implements Fortnite {
     private final String epicGamesPassword;
     private final String epicGamesLauncherToken;
     private final String fortniteClientToken;
+    private final boolean autoAcceptEulaAndGrantAccess;
     private final CloseableHttpClient httpClient;
     private final AccountResource accountResource;
     private final AuthenticationResource authenticationResource;
@@ -36,12 +37,15 @@ public final class DefaultFortnite implements Fortnite {
         epicGamesPassword = builder.epicGamesPassword;
         epicGamesLauncherToken = builder.epicGamesLauncherToken;
         fortniteClientToken = builder.fortniteClientToken;
+        autoAcceptEulaAndGrantAccess = builder.autoAcceptEulaAndGrantAccess;
         httpClient = HttpClients.createDefault();
         authenticationResource = AuthenticationResource.newInstance(
             httpClient,
             JsonOptionalResponseHandlerProvider.INSTANCE
         );
         sessionToken = fetchSessionToken();
+        if (autoAcceptEulaAndGrantAccess)
+            acceptEulaIfNeededAndGrantAccess();
         accountResource = DefaultAccountResource.newInstance(
             httpClient,
             JsonOptionalResponseHandlerProvider.INSTANCE,
@@ -110,6 +114,33 @@ public final class DefaultFortnite implements Fortnite {
         }
     }
 
+    private void acceptEulaIfNeededAndGrantAccess() throws IOException {
+        try {
+            final var eulaVersionLongOptional = authenticationResource.getEula(
+                sessionToken.accessToken(),
+                sessionToken.accountId()
+            )
+                .map(Eula::version);
+            if (eulaVersionLongOptional.isPresent())
+                authenticationResource.acceptEula(
+                    sessionToken.accessToken(),
+                    sessionToken.accountId(),
+                    eulaVersionLongOptional.orElseThrow()
+                );
+        } catch (final IOException exception) {
+            authenticationResource.retireAccessToken(sessionToken.accessToken());
+            throw new IOException("Couldn't accept EULA", exception);
+        }
+        try {
+            authenticationResource.grantAccess(
+                sessionToken.accessToken(),
+                sessionToken.accountId()
+            );
+        } catch (final IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
     @Override
     public AccountResource account() {
         return accountResource;
@@ -163,6 +194,7 @@ public final class DefaultFortnite implements Fortnite {
         private final String epicGamesPassword;
         private String epicGamesLauncherToken = "MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=";
         private String fortniteClientToken = "ZWM2ODRiOGM2ODdmNDc5ZmFkZWEzY2IyYWQ4M2Y1YzY6ZTFmMzFjMjExZjI4NDEzMTg2MjYyZDM3YTEzZmM4NGQ=";
+        private boolean autoAcceptEulaAndGrantAccess = false;
 
         private Builder(final String epicGamesEmailAddress, final String epicGamesPassword) {
             this.epicGamesEmailAddress = epicGamesEmailAddress;
@@ -200,6 +232,18 @@ public final class DefaultFortnite implements Fortnite {
          */
         public Builder setFortniteClientToken(final String fortniteClientToken) {
             this.fortniteClientToken = Objects.requireNonNull(fortniteClientToken, "fortniteClientToken cannot be null");
+            return this;
+        }
+
+        /**
+         * @param autoAcceptEulaAndGrantAccess {@code true} to automatically accept Fortnite's EULA for the
+         *                                     authenticated user and to grant the user access to Fortnite's APIs if needed.
+         *                                     {@code false} to not automatically accept Fortnite's EULA or grant the
+         *                                     authenticated user access to Fortnite's APIs if needed
+         * @return the {@link Builder} instance this was called on
+         */
+        public Builder setAutoAcceptEulaAndGrantAccess(final boolean autoAcceptEulaAndGrantAccess) {
+            this.autoAcceptEulaAndGrantAccess = autoAcceptEulaAndGrantAccess;
             return this;
         }
 

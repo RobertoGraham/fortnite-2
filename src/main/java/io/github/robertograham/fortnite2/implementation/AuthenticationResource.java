@@ -99,4 +99,48 @@ final class AuthenticationResource {
             optionalResponseHandlerProvider.forString()
         );
     }
+
+    Optional<Eula> getEula(final String accessToken, final String accountId) throws IOException {
+        return httpClient.execute(
+            RequestBuilder.get(String.format(
+                "%s/%s",
+                "https://eulatracking-public-service-prod-m.ol.epicgames.com/eulatracking/api/public/agreements/fn/account",
+                accountId
+            ))
+                .setHeader(AUTHORIZATION, "bearer " + accessToken)
+                .addParameter("locale", "en-US")
+                .build(),
+            optionalResponseHandlerProvider.forClass(Eula.class)
+        );
+    }
+
+    void acceptEula(final String accessToken, final String accountId, final long eulaVersion) throws IOException {
+        httpClient.execute(
+            RequestBuilder.post(String.format(
+                "%s/%d/%s/%s/%s",
+                "https://eulatracking-public-service-prod-m.ol.epicgames.com/eulatracking/api/public/agreements/fn/version",
+                eulaVersion,
+                "account",
+                accountId,
+                "accept"
+            ))
+                .setHeader(AUTHORIZATION, "bearer " + accessToken)
+                .addParameter("locale", "en")
+                .build(),
+            optionalResponseHandlerProvider.forString()
+        );
+    }
+
+    void grantAccess(final String accessToken, final String accountId) throws IOException {
+        httpClient.execute(
+            RequestBuilder.post(String.format(
+                "%s/%s",
+                "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/grant_access",
+                accountId
+            ))
+                .setHeader(AUTHORIZATION, "bearer " + accessToken)
+                .build(),
+            optionalResponseHandlerProvider.forString()
+        );
+    }
 }

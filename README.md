@@ -10,6 +10,8 @@ A Java 11+ client for the APIs used by Epic Games Launcher and the Fortnite clie
 * Fetching and filtering (by platform, party type, and time window) of an account's Battle Royale statistics
 * Fetching of all-time win leader boards using different combinations of platform and party type
 * Fetching of a single account via its username or many accounts via their IDs
+* Adding and removing friends, accepting and declining friend requests
+* Fortnite EULA auto-accepting
 
 ## Installation
 
@@ -64,6 +66,22 @@ public class Main {
             .setEpicGamesLauncherToken("launcherToken")
             .setFortniteClientToken("clientToken");
         final var fortnite = builder.build();
+    }
+}
+```
+
+Fortnite's EULA can be automatically accepted and access can be granted to Fortnite's APIs like so:
+
+```java
+import io.github.robertograham.fortnite2.implementation.DefaultFortnite.Builder;
+
+public final class Main {
+
+    public static void main(final String[] args) {
+        try (final var fortnite = Builder.newInstance("epicGamesEmailAddress", "epicGamesPassword")
+            .setAutoAcceptEulaAndGrantAccess(true)
+            .build()) {
+        }
     }
 }
 ```
