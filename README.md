@@ -12,6 +12,7 @@ A Java 11+ client for the APIs used by Epic Games Launcher and the Fortnite clie
 * Fetching of a single account via its username or many accounts via their IDs
 * Adding and removing friends, accepting and declining friend requests
 * Fortnite EULA auto-accepting
+* Two-factor authentication
 
 ## Installation
 
