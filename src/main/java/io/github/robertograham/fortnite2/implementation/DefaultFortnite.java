@@ -6,13 +6,19 @@ import io.github.robertograham.fortnite2.resource.AccountResource;
 import io.github.robertograham.fortnite2.resource.FriendResource;
 import io.github.robertograham.fortnite2.resource.LeaderBoardResource;
 import io.github.robertograham.fortnite2.resource.StatisticResource;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Default implementation of {@link Fortnite} created using {@link Builder}
@@ -23,7 +29,8 @@ public final class DefaultFortnite implements Fortnite {
     private final String epicGamesPassword;
     private final String epicGamesLauncherToken;
     private final String fortniteClientToken;
-    private final boolean autoAcceptEulaAndGrantAccess;
+    private final String challenge;
+    private final String code;
     private final CloseableHttpClient httpClient;
     private final AccountResource accountResource;
     private final AuthenticationResource authenticationResource;
@@ -37,14 +44,22 @@ public final class DefaultFortnite implements Fortnite {
         epicGamesPassword = builder.epicGamesPassword;
         epicGamesLauncherToken = builder.epicGamesLauncherToken;
         fortniteClientToken = builder.fortniteClientToken;
-        autoAcceptEulaAndGrantAccess = builder.autoAcceptEulaAndGrantAccess;
-        httpClient = HttpClients.createDefault();
+        challenge = builder.challenge;
+        code = builder.code;
+        httpClient = HttpClientBuilder.create()
+            .setDefaultHeaders(Set.of(new BasicHeader("X-Epic-Device-ID", "".equals(builder.deviceId) ?
+                DigestUtils.md5Hex(NetworkInterface.getByInetAddress(InetAddress.getLocalHost())
+                    .getHardwareAddress())
+                : builder.deviceId)))
+            .build();
         authenticationResource = AuthenticationResource.newInstance(
             httpClient,
             JsonOptionalResponseHandlerProvider.INSTANCE
         );
         sessionToken = fetchSessionToken();
-        if (autoAcceptEulaAndGrantAccess)
+        if (builder.killOtherSessions)
+            killOtherSessions();
+        if (builder.autoAcceptEulaAndGrantAccess)
             acceptEulaIfNeededAndGrantAccess();
         accountResource = DefaultAccountResource.newInstance(
             httpClient,
@@ -73,12 +88,20 @@ public final class DefaultFortnite implements Fortnite {
     }
 
     private Token fetchSessionToken() throws IOException {
-        final var accessTokenString = authenticationResource.passwordGrantedToken(
-            epicGamesEmailAddress,
-            epicGamesPassword,
-            epicGamesLauncherToken
-        )
-            .map(Token::accessToken)
+        var tokenOptional = Optional.<Token>empty();
+        if (!challenge.isEmpty() && !code.isEmpty())
+            tokenOptional = authenticationResource.twoFactorAuthenticationCodeGrantedToken(
+                epicGamesLauncherToken,
+                challenge,
+                code
+            );
+        else
+            tokenOptional = authenticationResource.passwordGrantedToken(
+                epicGamesEmailAddress,
+                epicGamesPassword,
+                epicGamesLauncherToken
+            );
+        final var accessTokenString = tokenOptional.map(Token::accessToken)
             .orElseThrow(() -> new IOException("Couldn't retrieve an access token"));
         final var exchangeCodeString = authenticationResource.accessTokenGrantedExchange(accessTokenString)
             .map(Exchange::code)
@@ -141,6 +164,10 @@ public final class DefaultFortnite implements Fortnite {
         }
     }
 
+    private void killOtherSessions() throws IOException {
+        authenticationResource.killOtherSessions(sessionToken.accessToken());
+    }
+
     @Override
     public AccountResource account() {
         return accountResource;
@@ -195,6 +222,10 @@ public final class DefaultFortnite implements Fortnite {
         private String epicGamesLauncherToken = "MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=";
         private String fortniteClientToken = "ZWM2ODRiOGM2ODdmNDc5ZmFkZWEzY2IyYWQ4M2Y1YzY6ZTFmMzFjMjExZjI4NDEzMTg2MjYyZDM3YTEzZmM4NGQ=";
         private boolean autoAcceptEulaAndGrantAccess = false;
+        private boolean killOtherSessions = false;
+        private String challenge = "";
+        private String code = "";
+        private String deviceId = "";
 
         private Builder(final String epicGamesEmailAddress, final String epicGamesPassword) {
             this.epicGamesEmailAddress = epicGamesEmailAddress;
@@ -202,6 +233,9 @@ public final class DefaultFortnite implements Fortnite {
         }
 
         /**
+         * Can supply two empty strings if {@link Builder#setTwoFactorAuthChallengeAndCodePair(String, String)}
+         * is being called with two non-empty strings
+         *
          * @param epicGamesEmailAddress email address used to log in
          * @param epicGamesPassword     password used to log in
          * @return a new {@link Builder} instance
@@ -248,15 +282,53 @@ public final class DefaultFortnite implements Fortnite {
         }
 
         /**
-         * @return a new instance of {@link Fortnite}
-         * @throws IllegalStateException if there's a problem logging in
+         * @param killOtherSessions {@code true} to kill existing sessions.
+         *                          {@code false} to not kill existing sessions
+         * @return the {@link Builder} instance this was called on
          */
-        public Fortnite build() {
-            try {
-                return new DefaultFortnite(this);
-            } catch (final IOException exception) {
-                throw new IllegalStateException("Error occurred when establishing session", exception);
-            }
+        public Builder setKillOtherSessions(final boolean killOtherSessions) {
+            this.killOtherSessions = killOtherSessions;
+            return this;
+        }
+
+        /**
+         * @param challenge can be obtained by calling {@code jsonObject.getString("challenge")} when
+         *                  {@link EpicGamesErrorException#jsonObject()} is present and
+         *                  {@link EpicGamesErrorException#type()} is {@code "errors.com.epicgames.common.two_factor_authentication.required"}
+         * @param code      2FA code obtained from Epic Games email inbox or authenticator app
+         * @return the {@link Builder} instance this was called on
+         * @throws NullPointerException if {@code challenge} is {@code null}
+         * @throws NullPointerException if {@code code} is {@code null}
+         */
+        public Builder setTwoFactorAuthChallengeAndCodePair(final String challenge, final String code) {
+            this.challenge = Objects.requireNonNull(challenge, "challenge cannot be null");
+            this.code = Objects.requireNonNull(code, "code cannot be null");
+            return this;
+        }
+
+        /**
+         * @param deviceId if you have successfully passed 2FA using this ID before,
+         *                 don't call {@link Builder#setTwoFactorAuthChallengeAndCodePair(String, String)}
+         * @return the {@link Builder} instance this was called on
+         * @throws NullPointerException     if {@code deviceId} is {@code null}
+         * @throws IllegalArgumentException if {@code deviceId} is empty
+         */
+        public Builder setDeviceId(final String deviceId) {
+            this.deviceId = Objects.requireNonNull(deviceId, "deviceId cannot be null");
+            if (this.deviceId.isEmpty())
+                throw new IllegalArgumentException("deviceId cannot be empty");
+            return this;
+        }
+
+        /**
+         * @return a new instance of {@link Fortnite}
+         * @throws EpicGamesErrorException       if there's an error response during authentication
+         * @throws java.net.SocketException      problem generating device ID. If this happens supply a non-empty device ID using {@link Builder#setDeviceId(String)}
+         * @throws java.net.UnknownHostException problem generating device ID. If this happens supply a non-empty device ID using {@link Builder#setDeviceId(String)}
+         * @throws IOException                   if there's a problem logging in
+         */
+        public Fortnite build() throws IOException {
+            return new DefaultFortnite(this);
         }
     }
 }

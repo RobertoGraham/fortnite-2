@@ -19,6 +19,7 @@ final class AuthenticationResource {
     private static final NameValuePair GRANT_TYPE_PASSWORD_PARAMETER = new BasicNameValuePair("grant_type", "password");
     private static final NameValuePair GRANT_TYPE_EXCHANGE_CODE_PARAMETER = new BasicNameValuePair("grant_type", "exchange_code");
     private static final NameValuePair GRANT_TYPE_REFRESH_TOKEN_PARAMETER = new BasicNameValuePair("grant_type", "refresh_token");
+    private static final NameValuePair GRANT_TYPE_OTP_PARAMETER = new BasicNameValuePair("grant_type", "otp");
     private static final NameValuePair TOKEN_TYPE_EG1 = new BasicNameValuePair("token_type", "eg1");
     private final CloseableHttpClient httpClient;
     private final OptionalResponseHandlerProvider optionalResponseHandlerProvider;
@@ -91,6 +92,17 @@ final class AuthenticationResource {
         );
     }
 
+    Optional<Token> twoFactorAuthenticationCodeGrantedToken(final String epicGamesLauncherToken,
+                                                            final String challenge,
+                                                            final String twoFactorAuthenticationCode) throws IOException {
+        return postForToken(
+            epicGamesLauncherToken,
+            GRANT_TYPE_OTP_PARAMETER,
+            new BasicNameValuePair("otp", twoFactorAuthenticationCode),
+            new BasicNameValuePair("challenge", challenge)
+        );
+    }
+
     void retireAccessToken(final String accessToken) throws IOException {
         httpClient.execute(
             RequestBuilder.delete("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/sessions/kill/" + accessToken)
@@ -138,6 +150,16 @@ final class AuthenticationResource {
                 "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/grant_access",
                 accountId
             ))
+                .setHeader(AUTHORIZATION, "bearer " + accessToken)
+                .build(),
+            optionalResponseHandlerProvider.forString()
+        );
+    }
+
+    void killOtherSessions(final String accessToken) throws IOException {
+        httpClient.execute(
+            RequestBuilder.delete("https://account-public-service-prod03.ol.epicgames.com/account/api/oauth/sessions/kill")
+                .addParameter("killType", "OTHERS_ACCOUNT_CLIENT_SERVICE")
                 .setHeader(AUTHORIZATION, "bearer " + accessToken)
                 .build(),
             optionalResponseHandlerProvider.forString()

@@ -1,18 +1,17 @@
 package io.github.robertograham.fortnite2.implementation;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.util.EntityUtils;
 
+import javax.json.Json;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
+import javax.json.stream.JsonParsingException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 
 enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvider {
@@ -67,20 +66,16 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
                 return httpEntity == null ?
                     Optional.empty()
                     : httpEntityToOptionalResultMapper.mapHttpEntityToOptionalResult(httpEntity);
-            EntityUtils.consumeQuietly(httpEntity);
-            throw new HttpResponseException(
-                statusLine.getStatusCode(),
-                String.format(
-                    "[%d] %s",
-                    statusLine.getStatusCode(),
-                    Arrays.stream(response.getAllHeaders())
-                        .filter((final var header) -> "X-Epic-Error-Name".equals(header.getName()))
-                        .findFirst()
-                        .map(Header::getValue)
-                        .filter(epicErrorName -> !epicErrorName.isBlank())
-                        .orElseGet(statusLine::getReasonPhrase)
-                )
-            );
+            final var inputStream = httpEntity != null ?
+                httpEntity.getContent()
+                : null;
+            if (inputStream == null)
+                throw new EpicGamesErrorException(statusLine, response.getAllHeaders());
+            try (inputStream; final var jsonReader = Json.createReader(inputStream)) {
+                throw new EpicGamesErrorException(statusCodeInt, jsonReader.readObject());
+            } catch (final JsonParsingException exception) {
+                throw new EpicGamesErrorException(statusLine, response.getAllHeaders());
+            }
         };
     }
 
