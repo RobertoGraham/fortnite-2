@@ -1,11 +1,14 @@
 package io.github.robertograham.fortnite2.implementation;
 
 import io.github.robertograham.fortnite2.domain.FilterableStatistic;
+import io.github.robertograham.fortnite2.domain.FilterableStatisticV2;
 import io.github.robertograham.fortnite2.resource.StatisticResource;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -79,5 +82,38 @@ final class DefaultStatisticResource implements StatisticResource {
     @Override
     public Optional<FilterableStatistic> findAllBySessionAccountIdForCurrentSeason() throws IOException {
         return findAllByAccountIdForCurrentSeason(sessionAccountIdSupplier.get());
+    }
+
+    @Override
+    public Optional<FilterableStatisticV2> findAllByAccountId(final String accountId,
+                                                              final ZonedDateTime startTime,
+                                                              final ZonedDateTime endTime) throws IOException {
+        Objects.requireNonNull(accountId, "accountId cannot be null");
+        Objects.requireNonNull(startTime, "startTime cannot be null");
+        Objects.requireNonNull(endTime, "endTime cannot be null");
+        if (startTime.isEqual(endTime) || startTime.isAfter(endTime))
+            throw new IllegalArgumentException("startTime must be less than endTime");
+        return httpClient.execute(
+            RequestBuilder.get(String.format(
+                "%s/%s",
+                "https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/statsv2/account",
+                accountId
+            ))
+                .addParameter("startTime", String.valueOf(startTime.withZoneSameInstant(ZoneOffset.UTC)
+                    .toEpochSecond()))
+                .addParameter("endTime", String.valueOf(endTime.withZoneSameInstant(ZoneOffset.UTC)
+                    .toEpochSecond()))
+                .setHeader(AUTHORIZATION, "bearer " + accessTokenSupplier.get())
+                .build(),
+            optionalResponseHandlerProvider.forClass(StatisticsV2.class)
+        )
+            .map(StatisticsV2::rawStatistics)
+            .map(DefaultFilterableStatisticV2::new);
+    }
+
+    @Override
+    public Optional<FilterableStatisticV2> findAllBySessionAccountId(final ZonedDateTime startTime,
+                                                                     final ZonedDateTime endTime) throws IOException {
+        return findAllByAccountId(sessionAccountIdSupplier.get(), startTime, endTime);
     }
 }

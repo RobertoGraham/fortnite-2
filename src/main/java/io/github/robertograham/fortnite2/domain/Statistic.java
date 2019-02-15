@@ -74,4 +74,20 @@ public interface Statistic {
      * @since 1.1.0
      */
     LocalDateTime timeLastModified();
+
+    /**
+     * @return the number of players that died before the user did
+     * @since 3.1.0
+     */
+    default long playersOutlived() {
+        return 0L;
+    }
+
+    /**
+     * @return the number of minutes the user has played Fortnite
+     * @since 3.1.0
+     */
+    default long minutesPlayed() {
+        return 0L;
+    }
 }

@@ -69,6 +69,16 @@ abstract class ForwardingStatistic implements Statistic {
     }
 
     @Override
+    public long playersOutlived() {
+        return statistic.playersOutlived();
+    }
+
+    @Override
+    public long minutesPlayed() {
+        return statistic.minutesPlayed();
+    }
+
+    @Override
     public String toString() {
         return "ForwardingStatistic{" +
             "statistic=" + statistic +

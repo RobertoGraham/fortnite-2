@@ -24,16 +24,16 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
         Cohort.Adapter.INSTANCE,
         RawLeaderBoard.Adapter.INSTANCE,
         DefaultFriendRequest.Adapter.INSTANCE,
-        Eula.Adapter.INSTANCE
+        Eula.Adapter.INSTANCE,
+        StatisticsV2.Adapter.INSTANCE
     );
 
     private final ResponseHandler<Optional<String>> stringOptionalHandler;
     private final Jsonb jsonb;
 
     JsonOptionalResponseHandlerProvider(final JsonbAdapter... jsonbAdapters) {
-        stringOptionalHandler = responseHandlerFromHttpEntityToOptionalResultMapper(
-            (final var httpEntity) -> Optional.ofNullable(EntityUtils.toString(httpEntity))
-        );
+        stringOptionalHandler = responseHandlerFromHttpEntityToOptionalResultMapper((final var httpEntity) ->
+            Optional.ofNullable(EntityUtils.toString(httpEntity)));
         jsonb = JsonbBuilder.create(new JsonbConfig()
             .withAdapters(jsonbAdapters));
     }
@@ -47,17 +47,17 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
     public <T> ResponseHandler<Optional<T>> forClass(final Class<T> tClass) {
         return responseHandlerFromHttpEntityToOptionalResultMapper(
             (final var httpEntity) -> {
-                try (final var inputStream = httpEntity.getContent()) {
-                    return Optional.ofNullable(inputStream)
-                        .map(nonNullInputStream -> jsonb.fromJson(nonNullInputStream, tClass));
+                final var inputStream = httpEntity.getContent();
+                if (inputStream == null)
+                    return Optional.empty();
+                try (inputStream) {
+                    return Optional.of(jsonb.fromJson(inputStream, tClass));
                 }
             }
         );
     }
 
-    private <T> ResponseHandler<Optional<T>> responseHandlerFromHttpEntityToOptionalResultMapper(
-        final HttpEntityToOptionalResultMapper<T> httpEntityToOptionalResultMapper
-    ) {
+    private <T> ResponseHandler<Optional<T>> responseHandlerFromHttpEntityToOptionalResultMapper(final HttpEntityToOptionalResultMapper<T> httpEntityToOptionalResultMapper) {
         return response -> {
             final var statusLine = response.getStatusLine();
             final var statusCodeInt = statusLine.getStatusCode();
@@ -71,7 +71,8 @@ enum JsonOptionalResponseHandlerProvider implements OptionalResponseHandlerProvi
                 : null;
             if (inputStream == null)
                 throw new EpicGamesErrorException(statusLine, response.getAllHeaders());
-            try (inputStream; final var jsonReader = Json.createReader(inputStream)) {
+            try (inputStream;
+                 final var jsonReader = Json.createReader(inputStream)) {
                 throw new EpicGamesErrorException(statusCodeInt, jsonReader.readObject());
             } catch (final JsonParsingException exception) {
                 throw new EpicGamesErrorException(statusLine, response.getAllHeaders());
