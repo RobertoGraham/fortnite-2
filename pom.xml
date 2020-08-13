@@ -48,7 +48,7 @@
         <httpclient.version>4.5.10</httpclient.version>
         <jakarta.json.bind-api.version>1.0.2</jakarta.json.bind-api.version>
         <jakarta.json-api.version>1.1.6</jakarta.json-api.version>
-        <yasson.version>1.0.5</yasson.version>
+        <yasson.version>1.0.8</yasson.version>
         <commons-codec.version>1.13</commons-codec.version>
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
         <mockito.version>3.0.0</mockito.version>
